@@ -1,3 +1,4 @@
+import { AppShell, NavLink } from '@mantine/core';
 import { Link, Outlet, createRootRoute } from '@tanstack/react-router';
 
 export const Route = createRootRoute({
@@ -6,17 +7,20 @@ export const Route = createRootRoute({
 
 function RootLayout() {
   return (
-    <>
-      <header>
-        <nav style={{ display: 'flex', gap: 10 }}>
-          <Link to='/'>Home</Link>
-          <Link to='/about'>About</Link>
-        </nav>
-      </header>
-      <hr />
-      <main>
+    <AppShell
+      padding='md'
+      navbar={{
+        width: 200,
+        breakpoint: 'sm',
+      }}
+    >
+      <AppShell.Navbar>
+        <NavLink label='Home' renderRoot={props => <Link to='/' {...props} />} />
+        <NavLink label='About' renderRoot={props => <Link to='/about' {...props} />} />
+      </AppShell.Navbar>
+      <AppShell.Main>
         <Outlet />
-      </main>
-    </>
+      </AppShell.Main>
+    </AppShell>
   );
 }
