@@ -2,7 +2,7 @@ import { Button, Group, Stack, Text, Title } from '@mantine/core';
 import { createLazyFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 
-export const Route = createLazyFileRoute('/')({
+export const Route = createLazyFileRoute('/_auth/')({
   component: IndexPage,
 });
 

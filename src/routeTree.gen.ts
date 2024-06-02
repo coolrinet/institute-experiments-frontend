@@ -13,41 +13,97 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as GuestImport } from './routes/_guest'
+import { Route as AuthImport } from './routes/_auth'
 
 // Create Virtual Routes
 
-const AboutLazyImport = createFileRoute('/about')()
-const IndexLazyImport = createFileRoute('/')()
+const AuthIndexLazyImport = createFileRoute('/_auth/')()
+const GuestLoginLazyImport = createFileRoute('/_guest/login')()
+const GuestForgotPasswordLazyImport = createFileRoute(
+  '/_guest/forgot-password',
+)()
+const AuthAboutLazyImport = createFileRoute('/_auth/about')()
 
 // Create/Update Routes
 
-const AboutLazyRoute = AboutLazyImport.update({
-  path: '/about',
+const GuestRoute = GuestImport.update({
+  id: '/_guest',
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/about.lazy').then((d) => d.Route))
+} as any)
 
-const IndexLazyRoute = IndexLazyImport.update({
-  path: '/',
+const AuthRoute = AuthImport.update({
+  id: '/_auth',
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+} as any)
+
+const AuthIndexLazyRoute = AuthIndexLazyImport.update({
+  path: '/',
+  getParentRoute: () => AuthRoute,
+} as any).lazy(() => import('./routes/_auth/index.lazy').then((d) => d.Route))
+
+const GuestLoginLazyRoute = GuestLoginLazyImport.update({
+  path: '/login',
+  getParentRoute: () => GuestRoute,
+} as any).lazy(() => import('./routes/_guest/login.lazy').then((d) => d.Route))
+
+const GuestForgotPasswordLazyRoute = GuestForgotPasswordLazyImport.update({
+  path: '/forgot-password',
+  getParentRoute: () => GuestRoute,
+} as any).lazy(() =>
+  import('./routes/_guest/forgot-password.lazy').then((d) => d.Route),
+)
+
+const AuthAboutLazyRoute = AuthAboutLazyImport.update({
+  path: '/about',
+  getParentRoute: () => AuthRoute,
+} as any).lazy(() => import('./routes/_auth/about.lazy').then((d) => d.Route))
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexLazyImport
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthImport
       parentRoute: typeof rootRoute
     }
-    '/about': {
-      id: '/about'
+    '/_guest': {
+      id: '/_guest'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof GuestImport
+      parentRoute: typeof rootRoute
+    }
+    '/_auth/about': {
+      id: '/_auth/about'
       path: '/about'
       fullPath: '/about'
-      preLoaderRoute: typeof AboutLazyImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof AuthAboutLazyImport
+      parentRoute: typeof AuthImport
+    }
+    '/_guest/forgot-password': {
+      id: '/_guest/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof GuestForgotPasswordLazyImport
+      parentRoute: typeof GuestImport
+    }
+    '/_guest/login': {
+      id: '/_guest/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof GuestLoginLazyImport
+      parentRoute: typeof GuestImport
+    }
+    '/_auth/': {
+      id: '/_auth/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof AuthIndexLazyImport
+      parentRoute: typeof AuthImport
     }
   }
 }
@@ -55,8 +111,11 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 export const routeTree = rootRoute.addChildren({
-  IndexLazyRoute,
-  AboutLazyRoute,
+  AuthRoute: AuthRoute.addChildren({ AuthAboutLazyRoute, AuthIndexLazyRoute }),
+  GuestRoute: GuestRoute.addChildren({
+    GuestForgotPasswordLazyRoute,
+    GuestLoginLazyRoute,
+  }),
 })
 
 /* prettier-ignore-end */
@@ -67,15 +126,39 @@ export const routeTree = rootRoute.addChildren({
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/",
-        "/about"
+        "/_auth",
+        "/_guest"
       ]
     },
-    "/": {
-      "filePath": "index.lazy.tsx"
+    "/_auth": {
+      "filePath": "_auth.tsx",
+      "children": [
+        "/_auth/about",
+        "/_auth/"
+      ]
     },
-    "/about": {
-      "filePath": "about.lazy.tsx"
+    "/_guest": {
+      "filePath": "_guest.tsx",
+      "children": [
+        "/_guest/forgot-password",
+        "/_guest/login"
+      ]
+    },
+    "/_auth/about": {
+      "filePath": "_auth/about.lazy.tsx",
+      "parent": "/_auth"
+    },
+    "/_guest/forgot-password": {
+      "filePath": "_guest/forgot-password.lazy.tsx",
+      "parent": "/_guest"
+    },
+    "/_guest/login": {
+      "filePath": "_guest/login.lazy.tsx",
+      "parent": "/_guest"
+    },
+    "/_auth/": {
+      "filePath": "_auth/index.lazy.tsx",
+      "parent": "/_auth"
     }
   }
 }
