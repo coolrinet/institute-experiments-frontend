@@ -1,7 +1,12 @@
 import { AppShell, NavLink } from '@mantine/core';
-import { Link, Outlet, createRootRoute } from '@tanstack/react-router';
+import { QueryClient } from '@tanstack/react-query';
+import { Link, Outlet, createRootRouteWithContext } from '@tanstack/react-router';
 
-export const Route = createRootRoute({
+type RouterContext = {
+  queryClient: QueryClient;
+};
+
+export const Route = createRootRouteWithContext<RouterContext>()({
   component: RootLayout,
 });
 
