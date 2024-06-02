@@ -75,6 +75,7 @@ function LoginPage() {
         console.error(error);
       }
     } finally {
+      form.setFieldValue('password', '');
       setIsPending(false);
     }
   };

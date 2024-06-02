@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '~/lib/api-client';
 
 import { User } from '~/types/api';
-import { LoginData } from '~/types/schema';
+import { ForgotPasswordData, LoginData, PasswordResetData } from '~/types/schema';
 
 export function useAuth() {
   const queryClient = useQueryClient();
@@ -31,7 +31,31 @@ export function useAuth() {
     await queryClient.invalidateQueries({ queryKey: ['auth.user'] });
   };
 
-  return { isAuthenticated: !!user, user, userError, isUserLoading, login, logout };
+  const forgotPassword = async (data: ForgotPasswordData) => {
+    await csrf();
+    await apiClient.post('/forgot-password', data);
+  };
+
+  const passwordReset = async (data: PasswordResetData) => {
+    await csrf();
+    await apiClient.post('/reset-password', {
+      password_confirmation: data.passwordConfirmation,
+      password: data.password,
+      token: data.token,
+      email: data.email,
+    });
+  };
+
+  return {
+    isAuthenticated: !!user,
+    user,
+    userError,
+    isUserLoading,
+    login,
+    logout,
+    forgotPassword,
+    passwordReset,
+  };
 }
 
 export type AuthContext = ReturnType<typeof useAuth>;

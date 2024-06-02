@@ -15,6 +15,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Route as rootRoute } from './routes/__root'
 import { Route as GuestImport } from './routes/_guest'
 import { Route as AuthImport } from './routes/_auth'
+import { Route as GuestResetPasswordImport } from './routes/_guest/reset-password'
 
 // Create Virtual Routes
 
@@ -59,6 +60,11 @@ const AuthAboutLazyRoute = AuthAboutLazyImport.update({
   getParentRoute: () => AuthRoute,
 } as any).lazy(() => import('./routes/_auth/about.lazy').then((d) => d.Route))
 
+const GuestResetPasswordRoute = GuestResetPasswordImport.update({
+  path: '/reset-password',
+  getParentRoute: () => GuestRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -76,6 +82,13 @@ declare module '@tanstack/react-router' {
       fullPath: ''
       preLoaderRoute: typeof GuestImport
       parentRoute: typeof rootRoute
+    }
+    '/_guest/reset-password': {
+      id: '/_guest/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof GuestResetPasswordImport
+      parentRoute: typeof GuestImport
     }
     '/_auth/about': {
       id: '/_auth/about'
@@ -113,6 +126,7 @@ declare module '@tanstack/react-router' {
 export const routeTree = rootRoute.addChildren({
   AuthRoute: AuthRoute.addChildren({ AuthAboutLazyRoute, AuthIndexLazyRoute }),
   GuestRoute: GuestRoute.addChildren({
+    GuestResetPasswordRoute,
     GuestForgotPasswordLazyRoute,
     GuestLoginLazyRoute,
   }),
@@ -140,9 +154,14 @@ export const routeTree = rootRoute.addChildren({
     "/_guest": {
       "filePath": "_guest.tsx",
       "children": [
+        "/_guest/reset-password",
         "/_guest/forgot-password",
         "/_guest/login"
       ]
+    },
+    "/_guest/reset-password": {
+      "filePath": "_guest/reset-password.tsx",
+      "parent": "/_guest"
     },
     "/_auth/about": {
       "filePath": "_auth/about.lazy.tsx",
