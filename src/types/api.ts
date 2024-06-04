@@ -1,5 +1,9 @@
 type ApiResponseBase<T> = {
-  data: T | T[];
+  data: T;
+  meta?: {
+    current_page: number;
+    last_page: number;
+  };
 };
 
 export type ApiErrorResponse = {
@@ -14,3 +18,5 @@ export type User = ApiResponseBase<{
   email: string;
   isAdmin?: boolean;
 }>;
+
+export type Users = ApiResponseBase<User['data'][]>;

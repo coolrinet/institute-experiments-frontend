@@ -58,6 +58,14 @@ function ForgotPasswordPage() {
             color: 'red',
             icon: <IconX size={16} />,
           });
+        } else {
+          console.error(error);
+          notifications.show({
+            title: 'Произошла ошибка',
+            message: 'Произошла непредвиденная ошибка',
+            color: 'red',
+            icon: <IconX size={16} />,
+          });
         }
       } else {
         console.error(error);

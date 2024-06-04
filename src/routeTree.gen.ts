@@ -16,6 +16,8 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as GuestImport } from './routes/_guest'
 import { Route as AuthImport } from './routes/_auth'
 import { Route as GuestResetPasswordImport } from './routes/_guest/reset-password'
+import { Route as AuthUsersImport } from './routes/_auth/users'
+import { Route as AuthUsersIndexImport } from './routes/_auth/users/index'
 
 // Create Virtual Routes
 
@@ -25,6 +27,7 @@ const GuestForgotPasswordLazyImport = createFileRoute(
   '/_guest/forgot-password',
 )()
 const AuthAboutLazyImport = createFileRoute('/_auth/about')()
+const AuthUsersAddNewLazyImport = createFileRoute('/_auth/users/add-new')()
 
 // Create/Update Routes
 
@@ -65,6 +68,23 @@ const GuestResetPasswordRoute = GuestResetPasswordImport.update({
   getParentRoute: () => GuestRoute,
 } as any)
 
+const AuthUsersRoute = AuthUsersImport.update({
+  path: '/users',
+  getParentRoute: () => AuthRoute,
+} as any)
+
+const AuthUsersIndexRoute = AuthUsersIndexImport.update({
+  path: '/',
+  getParentRoute: () => AuthUsersRoute,
+} as any)
+
+const AuthUsersAddNewLazyRoute = AuthUsersAddNewLazyImport.update({
+  path: '/add-new',
+  getParentRoute: () => AuthUsersRoute,
+} as any).lazy(() =>
+  import('./routes/_auth/users/add-new.lazy').then((d) => d.Route),
+)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -82,6 +102,13 @@ declare module '@tanstack/react-router' {
       fullPath: ''
       preLoaderRoute: typeof GuestImport
       parentRoute: typeof rootRoute
+    }
+    '/_auth/users': {
+      id: '/_auth/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof AuthUsersImport
+      parentRoute: typeof AuthImport
     }
     '/_guest/reset-password': {
       id: '/_guest/reset-password'
@@ -118,13 +145,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthIndexLazyImport
       parentRoute: typeof AuthImport
     }
+    '/_auth/users/add-new': {
+      id: '/_auth/users/add-new'
+      path: '/add-new'
+      fullPath: '/users/add-new'
+      preLoaderRoute: typeof AuthUsersAddNewLazyImport
+      parentRoute: typeof AuthUsersImport
+    }
+    '/_auth/users/': {
+      id: '/_auth/users/'
+      path: '/'
+      fullPath: '/users/'
+      preLoaderRoute: typeof AuthUsersIndexImport
+      parentRoute: typeof AuthUsersImport
+    }
   }
 }
 
 // Create and export the route tree
 
 export const routeTree = rootRoute.addChildren({
-  AuthRoute: AuthRoute.addChildren({ AuthAboutLazyRoute, AuthIndexLazyRoute }),
+  AuthRoute: AuthRoute.addChildren({
+    AuthUsersRoute: AuthUsersRoute.addChildren({
+      AuthUsersAddNewLazyRoute,
+      AuthUsersIndexRoute,
+    }),
+    AuthAboutLazyRoute,
+    AuthIndexLazyRoute,
+  }),
   GuestRoute: GuestRoute.addChildren({
     GuestResetPasswordRoute,
     GuestForgotPasswordLazyRoute,
@@ -147,6 +195,7 @@ export const routeTree = rootRoute.addChildren({
     "/_auth": {
       "filePath": "_auth.tsx",
       "children": [
+        "/_auth/users",
         "/_auth/about",
         "/_auth/"
       ]
@@ -157,6 +206,14 @@ export const routeTree = rootRoute.addChildren({
         "/_guest/reset-password",
         "/_guest/forgot-password",
         "/_guest/login"
+      ]
+    },
+    "/_auth/users": {
+      "filePath": "_auth/users.tsx",
+      "parent": "/_auth",
+      "children": [
+        "/_auth/users/add-new",
+        "/_auth/users/"
       ]
     },
     "/_guest/reset-password": {
@@ -178,6 +235,14 @@ export const routeTree = rootRoute.addChildren({
     "/_auth/": {
       "filePath": "_auth/index.lazy.tsx",
       "parent": "/_auth"
+    },
+    "/_auth/users/add-new": {
+      "filePath": "_auth/users/add-new.lazy.tsx",
+      "parent": "/_auth/users"
+    },
+    "/_auth/users/": {
+      "filePath": "_auth/users/index.tsx",
+      "parent": "/_auth/users"
     }
   }
 }

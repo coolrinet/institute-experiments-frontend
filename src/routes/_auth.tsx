@@ -1,7 +1,7 @@
 import { AppShell, Burger, Button, Group, NavLink } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { IconCheck, IconX } from '@tabler/icons-react';
+import { IconCheck, IconHome, IconUsers, IconX } from '@tabler/icons-react';
 import { Link, Outlet, createFileRoute, redirect, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
 import React, { useState } from 'react';
@@ -64,6 +64,14 @@ function AuthLayout() {
             color: 'red',
             icon: <IconX size={16} />,
           });
+        } else {
+          console.error(error);
+          notifications.show({
+            title: 'Произошла ошибка',
+            message: 'Произошла непредвиденная ошибка',
+            color: 'red',
+            icon: <IconX size={16} />,
+          });
         }
       } else {
         console.error(error);
@@ -101,8 +109,16 @@ function AuthLayout() {
         </Group>
       </AppShell.Header>
       <AppShell.Navbar>
-        <NavLink label='Home' renderRoot={props => <Link to='/' {...props} />} />
-        <NavLink label='About' renderRoot={props => <Link to='/about' {...props} />} />
+        <NavLink
+          leftSection={<IconHome size={16} />}
+          label='Главная'
+          renderRoot={props => <Link to='/' {...props} />}
+        />
+        <NavLink
+          leftSection={<IconUsers size={16} />}
+          label='Пользователи'
+          renderRoot={props => <Link to='/users' {...props} />}
+        />
       </AppShell.Navbar>
       <AppShell.Main>
         <Outlet />
