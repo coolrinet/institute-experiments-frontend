@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '~/lib/api-client';
 
 import { User } from '~/types/api';
-import { ForgotPasswordData, LoginData, PasswordResetData } from '~/types/schema';
+import { ForgotPasswordData, LoginData, ResetPasswordData } from '~/types/schema';
 
 export function useAuth() {
   const queryClient = useQueryClient();
@@ -11,10 +11,16 @@ export function useAuth() {
   const {
     data: user,
     error: userError,
-    isPending: isUserLoading,
+    isFetching,
   } = useQuery({
     queryKey: ['auth.user'],
-    queryFn: () => apiClient.get<User>('/api/profile').then(res => res.data),
+    queryFn: () => {
+      try {
+        return apiClient.get<User>('/api/profile').then(response => response.data);
+      } catch (error) {
+        return null;
+      }
+    },
   });
 
   const csrf = () => apiClient.get('/sanctum/csrf-cookie');
@@ -36,7 +42,7 @@ export function useAuth() {
     await apiClient.post('/forgot-password', data);
   };
 
-  const passwordReset = async (data: PasswordResetData) => {
+  const passwordReset = async (data: ResetPasswordData) => {
     await csrf();
     await apiClient.post('/reset-password', {
       password_confirmation: data.passwordConfirmation,
@@ -50,7 +56,7 @@ export function useAuth() {
     isAuthenticated: !!user,
     user,
     userError,
-    isUserLoading,
+    isUserLoading: isFetching,
     login,
     logout,
     forgotPassword,
