@@ -23,3 +23,22 @@ export type ResetPasswordData = z.infer<typeof resetPasswordSchema> & {
   token: string;
   email: string;
 };
+
+export const addUserSchema = z.object({
+  lastName: z
+    .string()
+    .min(1, 'Данное поле является обязательным')
+    .max(255, 'Длина данного поля не должна превышать 255 символов'),
+  firstName: z
+    .string()
+    .min(1, 'Данное поле является обязательным')
+    .max(255, 'Длина данного поля не должна превышать 255 символов'),
+  middleName: z.string().max(255, 'Длина данного поля не должна превышать 255 символов').optional(),
+  email: z
+    .string()
+    .min(1, 'Данное поле является обязательным')
+    .email('Введите корректный email')
+    .max(255, 'Длина данного поля не должна превышать 255 символов'),
+  isAdmin: z.boolean().default(false),
+});
+export type AddUserData = z.infer<typeof addUserSchema>;
