@@ -63,7 +63,7 @@ function LoginPage() {
       });
     } catch (error) {
       if (axios.isAxiosError<ApiErrorResponse>(error)) {
-        if (error.response) {
+        if (error.response && error.status !== 500) {
           notifications.show({
             title: 'Произошла ошибка',
             message: error.response.data.message,
@@ -73,6 +73,12 @@ function LoginPage() {
         }
       } else {
         console.error(error);
+        notifications.show({
+          title: 'Произошла ошибка',
+          message: 'Произошла непредвиденная ошибка',
+          color: 'red',
+          icon: <IconX size={16} />,
+        });
       }
     } finally {
       form.setFieldValue('password', '');
