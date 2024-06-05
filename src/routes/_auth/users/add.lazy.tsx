@@ -10,7 +10,7 @@ import { addUser } from '~/api/users/add-user';
 import { ApiErrorResponse } from '~/types/api';
 import { AddUserData, addUserSchema } from '~/types/schema';
 
-export const Route = createLazyFileRoute('/_auth/users/add-new')({
+export const Route = createLazyFileRoute('/_auth/users/add')({
   component: AddNewUserPage,
 });
 

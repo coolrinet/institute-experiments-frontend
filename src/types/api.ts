@@ -20,3 +20,12 @@ export type User = ApiResponseBase<{
 }>;
 
 export type Users = ApiResponseBase<User['data'][]>;
+
+export type Machineries = ApiResponseBase<
+  {
+    id: number;
+    name: string;
+    description: string;
+    user: User['data'];
+  }[]
+>;

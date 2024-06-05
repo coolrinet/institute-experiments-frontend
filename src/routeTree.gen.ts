@@ -18,6 +18,7 @@ import { Route as AuthImport } from './routes/_auth'
 import { Route as GuestResetPasswordImport } from './routes/_guest/reset-password'
 import { Route as AuthUsersImport } from './routes/_auth/users'
 import { Route as AuthUsersIndexImport } from './routes/_auth/users/index'
+import { Route as AuthMachineriesIndexImport } from './routes/_auth/machineries/index'
 
 // Create Virtual Routes
 
@@ -27,7 +28,8 @@ const GuestForgotPasswordLazyImport = createFileRoute(
   '/_guest/forgot-password',
 )()
 const AuthAboutLazyImport = createFileRoute('/_auth/about')()
-const AuthUsersAddNewLazyImport = createFileRoute('/_auth/users/add-new')()
+const AuthUsersAddLazyImport = createFileRoute('/_auth/users/add')()
+const AuthMachineriesAddLazyImport = createFileRoute('/_auth/machineries/add')()
 
 // Create/Update Routes
 
@@ -78,11 +80,23 @@ const AuthUsersIndexRoute = AuthUsersIndexImport.update({
   getParentRoute: () => AuthUsersRoute,
 } as any)
 
-const AuthUsersAddNewLazyRoute = AuthUsersAddNewLazyImport.update({
-  path: '/add-new',
+const AuthMachineriesIndexRoute = AuthMachineriesIndexImport.update({
+  path: '/machineries/',
+  getParentRoute: () => AuthRoute,
+} as any)
+
+const AuthUsersAddLazyRoute = AuthUsersAddLazyImport.update({
+  path: '/add',
   getParentRoute: () => AuthUsersRoute,
 } as any).lazy(() =>
-  import('./routes/_auth/users/add-new.lazy').then((d) => d.Route),
+  import('./routes/_auth/users/add.lazy').then((d) => d.Route),
+)
+
+const AuthMachineriesAddLazyRoute = AuthMachineriesAddLazyImport.update({
+  path: '/machineries/add',
+  getParentRoute: () => AuthRoute,
+} as any).lazy(() =>
+  import('./routes/_auth/machineries/add.lazy').then((d) => d.Route),
 )
 
 // Populate the FileRoutesByPath interface
@@ -145,12 +159,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthIndexLazyImport
       parentRoute: typeof AuthImport
     }
-    '/_auth/users/add-new': {
-      id: '/_auth/users/add-new'
-      path: '/add-new'
-      fullPath: '/users/add-new'
-      preLoaderRoute: typeof AuthUsersAddNewLazyImport
+    '/_auth/machineries/add': {
+      id: '/_auth/machineries/add'
+      path: '/machineries/add'
+      fullPath: '/machineries/add'
+      preLoaderRoute: typeof AuthMachineriesAddLazyImport
+      parentRoute: typeof AuthImport
+    }
+    '/_auth/users/add': {
+      id: '/_auth/users/add'
+      path: '/add'
+      fullPath: '/users/add'
+      preLoaderRoute: typeof AuthUsersAddLazyImport
       parentRoute: typeof AuthUsersImport
+    }
+    '/_auth/machineries/': {
+      id: '/_auth/machineries/'
+      path: '/machineries'
+      fullPath: '/machineries'
+      preLoaderRoute: typeof AuthMachineriesIndexImport
+      parentRoute: typeof AuthImport
     }
     '/_auth/users/': {
       id: '/_auth/users/'
@@ -167,11 +195,13 @@ declare module '@tanstack/react-router' {
 export const routeTree = rootRoute.addChildren({
   AuthRoute: AuthRoute.addChildren({
     AuthUsersRoute: AuthUsersRoute.addChildren({
-      AuthUsersAddNewLazyRoute,
+      AuthUsersAddLazyRoute,
       AuthUsersIndexRoute,
     }),
     AuthAboutLazyRoute,
     AuthIndexLazyRoute,
+    AuthMachineriesAddLazyRoute,
+    AuthMachineriesIndexRoute,
   }),
   GuestRoute: GuestRoute.addChildren({
     GuestResetPasswordRoute,
@@ -197,7 +227,9 @@ export const routeTree = rootRoute.addChildren({
       "children": [
         "/_auth/users",
         "/_auth/about",
-        "/_auth/"
+        "/_auth/",
+        "/_auth/machineries/add",
+        "/_auth/machineries/"
       ]
     },
     "/_guest": {
@@ -212,7 +244,7 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "_auth/users.tsx",
       "parent": "/_auth",
       "children": [
-        "/_auth/users/add-new",
+        "/_auth/users/add",
         "/_auth/users/"
       ]
     },
@@ -236,9 +268,17 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "_auth/index.lazy.tsx",
       "parent": "/_auth"
     },
-    "/_auth/users/add-new": {
-      "filePath": "_auth/users/add-new.lazy.tsx",
+    "/_auth/machineries/add": {
+      "filePath": "_auth/machineries/add.lazy.tsx",
+      "parent": "/_auth"
+    },
+    "/_auth/users/add": {
+      "filePath": "_auth/users/add.lazy.tsx",
       "parent": "/_auth/users"
+    },
+    "/_auth/machineries/": {
+      "filePath": "_auth/machineries/index.tsx",
+      "parent": "/_auth"
     },
     "/_auth/users/": {
       "filePath": "_auth/users/index.tsx",

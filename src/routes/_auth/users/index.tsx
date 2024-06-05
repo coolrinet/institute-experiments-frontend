@@ -7,6 +7,7 @@ import {
   Pagination,
   Stack,
   Table,
+  Text,
   Title,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
@@ -129,27 +130,33 @@ function UsersPage() {
   return (
     <Stack>
       <Title>Список пользователей</Title>
-      <Box pos='relative'>
-        <LoadingOverlay visible={isFetching} />
-        <Table>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>Фамилия</Table.Th>
-              <Table.Th>Имя</Table.Th>
-              <Table.Th>Отчество</Table.Th>
-              <Table.Th>Email</Table.Th>
-              <Table.Th>Администратор?</Table.Th>
-              <Table.Th>Действия</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>{tableRows}</Table.Tbody>
-        </Table>
-      </Box>
+
+      {users.data.length > 0 ? (
+        <Box pos='relative'>
+          <LoadingOverlay visible={isFetching} />
+          <Table>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Фамилия</Table.Th>
+                <Table.Th>Имя</Table.Th>
+                <Table.Th>Отчество</Table.Th>
+                <Table.Th>Email</Table.Th>
+                <Table.Th>Администратор?</Table.Th>
+                <Table.Th>Действия</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>{tableRows}</Table.Tbody>
+          </Table>
+        </Box>
+      ) : (
+        <Text>Пользователи отсутствуют</Text>
+      )}
+
       <Group justify='space-between'>
-        {totalPages && (
+        {totalPages && totalPages > 1 && (
           <Pagination value={search.page} total={totalPages} onChange={onPageChange} />
         )}
-        <Button renderRoot={props => <Link to='/users/add-new' {...props} />}>
+        <Button renderRoot={props => <Link to='/users/add' {...props} />}>
           Добавить пользователя
         </Button>
       </Group>

@@ -1,7 +1,7 @@
 import { AppShell, Burger, Button, Group, NavLink } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { IconCheck, IconHome, IconUsers, IconX } from '@tabler/icons-react';
+import { IconBuildingFactory, IconCheck, IconHome, IconUsers, IconX } from '@tabler/icons-react';
 import { Link, Outlet, createFileRoute, redirect, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
 import React, { useState } from 'react';
@@ -33,7 +33,7 @@ function AuthLayout() {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
 
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
 
   const [isPending, setIsPending] = useState(false);
 
@@ -115,10 +115,17 @@ function AuthLayout() {
           renderRoot={props => <Link to='/' {...props} />}
         />
         <NavLink
-          leftSection={<IconUsers size={16} />}
-          label='Пользователи'
-          renderRoot={props => <Link to='/users' {...props} />}
+          leftSection={<IconBuildingFactory size={16} />}
+          label='Установки'
+          renderRoot={props => <Link to='/machineries' {...props} />}
         />
+        {user?.data.isAdmin && (
+          <NavLink
+            leftSection={<IconUsers size={16} />}
+            label='Пользователи'
+            renderRoot={props => <Link to='/users' {...props} />}
+          />
+        )}
       </AppShell.Navbar>
       <AppShell.Main>
         <Outlet />
