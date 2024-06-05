@@ -49,7 +49,11 @@ function MachineriesPage() {
   };
 
   const onMachineryNameChange = async (name: string) => {
-    await navigate({ search: { ...search, name } });
+    if (name) {
+      await navigate({ search: { page: 1, name } });
+    } else {
+      await navigate({ search: { page: 1 } });
+    }
   };
 
   const handleMachinerySearch = useDebouncedCallback(async (name: string) => {

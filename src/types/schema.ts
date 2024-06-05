@@ -42,3 +42,12 @@ export const addUserSchema = z.object({
   isAdmin: z.boolean().default(false),
 });
 export type AddUserData = z.infer<typeof addUserSchema>;
+
+export const machinerySchema = z.object({
+  name: z
+    .string()
+    .min(1, 'Данное поле является обязательным')
+    .max(255, 'Длина данного поля не должна превышать 255 символов'),
+  description: z.string().nullable(),
+});
+export type MachineryData = z.infer<typeof machinerySchema>;
