@@ -1,4 +1,5 @@
 import {
+  ActionIcon,
   Box,
   Button,
   Group,
@@ -11,17 +12,22 @@ import {
   Title,
 } from '@mantine/core';
 import { useDebouncedCallback } from '@mantine/hooks';
-import { IconSearch } from '@tabler/icons-react';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { Link, createFileRoute } from '@tanstack/react-router';
+import { notifications } from '@mantine/notifications';
+import { IconCheck, IconSearch, IconTrash, IconX } from '@tabler/icons-react';
+import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { Link, createFileRoute, useRouter } from '@tanstack/react-router';
+import axios from 'axios';
 import { z } from 'zod';
+import { deleteMachinery } from '~/api/machineries/delete-machinery';
 import { getMachineriesQueryOptions } from '~/api/machineries/get-machineries';
 
 import PageLoader from '~/components/Loader';
 
+import { ApiErrorResponse } from '~/types/api';
+
 export const Route = createFileRoute('/_auth/machineries/')({
   validateSearch: z.object({
-    page: z.number().optional().catch(1),
+    page: z.number().optional().default(1),
     name: z.string().optional().catch(''),
   }),
   loaderDeps: ({ search }) => search,
@@ -34,15 +40,12 @@ export const Route = createFileRoute('/_auth/machineries/')({
 function MachineriesPage() {
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
-  // const router = useRouter();
+  const router = useRouter();
 
-  const {
-    data: machineries,
-    isFetching,
-    isPending,
-  } = useSuspenseQuery(getMachineriesQueryOptions(search));
+  const queryClient = useQueryClient();
+  const { data: machineries, isFetching } = useSuspenseQuery(getMachineriesQueryOptions(search));
 
-  const totalPages = machineries.meta?.last_page;
+  const totalPages = machineries.meta!.last_page;
 
   const onPageChange = async (page: number) => {
     await navigate({ search: { ...search, page } });
@@ -60,6 +63,60 @@ function MachineriesPage() {
     await onMachineryNameChange(name);
   }, 200);
 
+  const handleDelete = async (machineryId: number) => {
+    const dialogResult = confirm('Вы действительно хотите удалить установку?');
+
+    if (!dialogResult) {
+      return;
+    }
+
+    try {
+      await deleteMachinery(machineryId);
+
+      await queryClient.invalidateQueries({ queryKey: ['machineries'] });
+
+      await router.invalidate();
+
+      notifications.show({
+        title: 'Успех',
+        message: 'Установка успешно удалена',
+        color: 'teal',
+        icon: <IconCheck size={16} />,
+      });
+
+      if (!machineries.data.length) {
+        await navigate({ search: { ...search, page: search.page - 1 } });
+      }
+    } catch (error) {
+      if (axios.isAxiosError<ApiErrorResponse>(error)) {
+        if (error.response && error.status !== 500) {
+          notifications.show({
+            title: 'Произошла ошибка',
+            message: error.response.data.message,
+            color: 'red',
+            icon: <IconX size={16} />,
+          });
+        } else {
+          console.error(error);
+          notifications.show({
+            title: 'Произошла ошибка',
+            message: 'Произошла непредвиденная ошибка',
+            color: 'red',
+            icon: <IconX size={16} />,
+          });
+        }
+      } else {
+        console.error(error);
+        notifications.show({
+          title: 'Произошла ошибка',
+          message: 'Произошла непредвиденная ошибка',
+          color: 'red',
+          icon: <IconX size={16} />,
+        });
+      }
+    }
+  };
+
   const tableRows = machineries.data.map(machinery => {
     let userFullName = `${machinery.user.lastName} ${machinery.user.firstName[0]}.`;
 
@@ -72,11 +129,11 @@ function MachineriesPage() {
         <Table.Td>{machinery.name}</Table.Td>
         <Table.Td>{machinery.description}</Table.Td>
         <Table.Td>{userFullName}</Table.Td>
-        {/* <Table.Td>
-        <ActionIcon color='red' onClick={() => handleDelete(user.id)}>
-          <IconTrash size={16} />
-        </ActionIcon>
-      </Table.Td> */}
+        <Table.Td>
+          <ActionIcon color='red' onClick={() => handleDelete(machinery.id)}>
+            <IconTrash size={16} />
+          </ActionIcon>
+        </Table.Td>
       </Table.Tr>
     );
   });
@@ -92,7 +149,7 @@ function MachineriesPage() {
         onChange={event => handleMachinerySearch(event.currentTarget.value)}
       />
       <Box pos='relative'>
-        <LoadingOverlay visible={isFetching || isPending} />
+        <LoadingOverlay visible={isFetching} />
         {machineries.data.length > 0 ? (
           <Table>
             <Table.Thead>
@@ -100,6 +157,7 @@ function MachineriesPage() {
                 <Table.Th>Название установки</Table.Th>
                 <Table.Th>Описание</Table.Th>
                 <Table.Th>Кем добавлена</Table.Th>
+                <Table.Th>Действия</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>{tableRows}</Table.Tbody>

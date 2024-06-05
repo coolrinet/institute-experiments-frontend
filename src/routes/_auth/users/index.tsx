@@ -43,7 +43,7 @@ function UsersPage() {
 
   const { data: users, isFetching } = useSuspenseQuery(getUsersQueryOptions(search));
 
-  const totalPages = users?.meta?.last_page;
+  const totalPages = users.meta!.last_page;
 
   const handleDelete = async (id: number) => {
     if (user?.data.id === id) {
@@ -77,7 +77,7 @@ function UsersPage() {
         icon: <IconCheck size={16} />,
       });
 
-      await navigate({ to: '/users', search: { page: users?.meta?.last_page } });
+      await navigate({ search: { ...search, page: search.page || 1 } });
     } catch (error) {
       if (axios.isAxiosError<ApiErrorResponse>(error)) {
         if (error.response && error.status !== 500) {
