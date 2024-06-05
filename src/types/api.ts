@@ -21,11 +21,16 @@ export type User = ApiResponseBase<{
 
 export type Users = ApiResponseBase<User['data'][]>;
 
+export type Machinery = ApiResponseBase<{
+  id: number;
+  name: string;
+  description: string;
+}>;
+
 export type Machineries = ApiResponseBase<
-  {
-    id: number;
-    name: string;
-    description: string;
-    user: User['data'];
-  }[]
+  Array<
+    Machinery['data'] & {
+      user: User['data'];
+    }
+  >
 >;

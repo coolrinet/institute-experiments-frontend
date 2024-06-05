@@ -13,7 +13,7 @@ import {
 } from '@mantine/core';
 import { useDebouncedCallback } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { IconCheck, IconSearch, IconTrash, IconX } from '@tabler/icons-react';
+import { IconCheck, IconEdit, IconSearch, IconTrash, IconX } from '@tabler/icons-react';
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { Link, createFileRoute, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
@@ -130,9 +130,22 @@ function MachineriesPage() {
         <Table.Td>{machinery.description}</Table.Td>
         <Table.Td>{userFullName}</Table.Td>
         <Table.Td>
-          <ActionIcon color='red' onClick={() => handleDelete(machinery.id)}>
-            <IconTrash size={16} />
-          </ActionIcon>
+          <ActionIcon.Group>
+            <ActionIcon
+              renderRoot={props => (
+                <Link
+                  to='/machineries/$machineryId/edit'
+                  params={{ machineryId: machinery.id }}
+                  {...props}
+                />
+              )}
+            >
+              <IconEdit size={16} />
+            </ActionIcon>
+            <ActionIcon color='red' onClick={() => handleDelete(machinery.id)}>
+              <IconTrash size={16} />
+            </ActionIcon>
+          </ActionIcon.Group>
         </Table.Td>
       </Table.Tr>
     );

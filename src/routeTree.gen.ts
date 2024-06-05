@@ -19,6 +19,7 @@ import { Route as GuestResetPasswordImport } from './routes/_guest/reset-passwor
 import { Route as AuthUsersImport } from './routes/_auth/users'
 import { Route as AuthUsersIndexImport } from './routes/_auth/users/index'
 import { Route as AuthMachineriesIndexImport } from './routes/_auth/machineries/index'
+import { Route as AuthMachineriesMachineryIdEditImport } from './routes/_auth/machineries/$machineryId.edit'
 
 // Create Virtual Routes
 
@@ -98,6 +99,12 @@ const AuthMachineriesAddLazyRoute = AuthMachineriesAddLazyImport.update({
 } as any).lazy(() =>
   import('./routes/_auth/machineries/add.lazy').then((d) => d.Route),
 )
+
+const AuthMachineriesMachineryIdEditRoute =
+  AuthMachineriesMachineryIdEditImport.update({
+    path: '/machineries/$machineryId/edit',
+    getParentRoute: () => AuthRoute,
+  } as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -187,6 +194,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthUsersIndexImport
       parentRoute: typeof AuthUsersImport
     }
+    '/_auth/machineries/$machineryId/edit': {
+      id: '/_auth/machineries/$machineryId/edit'
+      path: '/machineries/$machineryId/edit'
+      fullPath: '/machineries/$machineryId/edit'
+      preLoaderRoute: typeof AuthMachineriesMachineryIdEditImport
+      parentRoute: typeof AuthImport
+    }
   }
 }
 
@@ -202,6 +216,7 @@ export const routeTree = rootRoute.addChildren({
     AuthIndexLazyRoute,
     AuthMachineriesAddLazyRoute,
     AuthMachineriesIndexRoute,
+    AuthMachineriesMachineryIdEditRoute,
   }),
   GuestRoute: GuestRoute.addChildren({
     GuestResetPasswordRoute,
@@ -229,7 +244,8 @@ export const routeTree = rootRoute.addChildren({
         "/_auth/about",
         "/_auth/",
         "/_auth/machineries/add",
-        "/_auth/machineries/"
+        "/_auth/machineries/",
+        "/_auth/machineries/$machineryId/edit"
       ]
     },
     "/_guest": {
@@ -283,6 +299,10 @@ export const routeTree = rootRoute.addChildren({
     "/_auth/users/": {
       "filePath": "_auth/users/index.tsx",
       "parent": "/_auth/users"
+    },
+    "/_auth/machineries/$machineryId/edit": {
+      "filePath": "_auth/machineries/$machineryId.edit.tsx",
+      "parent": "/_auth"
     }
   }
 }
