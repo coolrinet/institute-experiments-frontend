@@ -2,6 +2,7 @@ import {
   ActionIcon,
   Box,
   Button,
+  Card,
   Group,
   LoadingOverlay,
   Pagination,
@@ -154,30 +155,35 @@ function MachineriesPage() {
   return (
     <Stack>
       <Title>Список установок</Title>
-      <TextInput
-        placeholder='Поиск по названию...'
-        leftSection={<IconSearch size={16} />}
-        leftSectionPointerEvents='none'
-        defaultValue={search.name}
-        onChange={event => handleMachinerySearch(event.currentTarget.value)}
-      />
+
       <Box pos='relative'>
         <LoadingOverlay visible={isFetching} />
-        {machineries.data.length > 0 ? (
-          <Table>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>Название установки</Table.Th>
-                <Table.Th>Описание</Table.Th>
-                <Table.Th>Кем добавлена</Table.Th>
-                <Table.Th>Действия</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>{tableRows}</Table.Tbody>
-          </Table>
-        ) : (
-          <Text>Установки отсутствуют</Text>
-        )}
+        <Card withBorder shadow='xl' padding='lg' radius='md'>
+          <Card.Section inheritPadding withBorder py='md'>
+            <TextInput
+              placeholder='Поиск по названию...'
+              leftSection={<IconSearch size={16} />}
+              leftSectionPointerEvents='none'
+              defaultValue={search.name}
+              onChange={event => handleMachinerySearch(event.currentTarget.value)}
+            />
+          </Card.Section>
+          {machineries.data.length > 0 ? (
+            <Table mt='sm'>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>Название установки</Table.Th>
+                  <Table.Th>Описание</Table.Th>
+                  <Table.Th>Кем добавлена</Table.Th>
+                  <Table.Th>Действия</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>{tableRows}</Table.Tbody>
+            </Table>
+          ) : (
+            <Text mt='sm'>Установки отсутствуют</Text>
+          )}
+        </Card>
       </Box>
       <Group justify='space-between'>
         {totalPages && totalPages > 1 && (
