@@ -1,7 +1,14 @@
 import { AppShell, Burger, Button, Group, NavLink } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { IconBuildingFactory, IconCheck, IconHome, IconUsers, IconX } from '@tabler/icons-react';
+import {
+  IconBuildingFactory,
+  IconCheck,
+  IconHome,
+  IconSettings,
+  IconUsers,
+  IconX,
+} from '@tabler/icons-react';
 import { Link, Outlet, createFileRoute, redirect, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
 import React, { useState } from 'react';
@@ -118,6 +125,11 @@ function AuthLayout() {
           leftSection={<IconBuildingFactory size={16} />}
           label='Установки'
           renderRoot={props => <Link to='/machineries' {...props} />}
+        />
+        <NavLink
+          leftSection={<IconSettings size={16} />}
+          label='Параметры установок'
+          renderRoot={props => <Link to='/machinery-parameters' {...props} />}
         />
         {user?.data.isAdmin && (
           <NavLink

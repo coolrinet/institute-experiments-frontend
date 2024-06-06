@@ -121,7 +121,7 @@ function MachineriesPage() {
     let userFullName = `${machinery.user.lastName} ${machinery.user.firstName[0]}.`;
 
     if (machinery.user.middleName) {
-      userFullName = `${userFullName} ${machinery.user.middleName[0]}.`;
+      userFullName += ` ${machinery.user.middleName[0]}.`;
     }
 
     return (

@@ -34,3 +34,15 @@ export type Machineries = ApiResponseBase<
     }
   >
 >;
+
+export type MachineryParameter = ApiResponseBase<{
+  id: number;
+  name: string;
+  parameterType: 'input' | 'output';
+  valueType: 'quantitative' | 'quality';
+  machinery: Machinery['data'] | null;
+}>;
+
+export type MachineryParameters = ApiResponseBase<
+  Array<MachineryParameter['data'] & { user: User['data'] }>
+>;
