@@ -79,8 +79,8 @@ function AddMachineryPage() {
     <Stack align='center'>
       <Title ta='center'>Добавить новую установку</Title>
 
-      <form onSubmit={form.onSubmit(handleSubmit)}>
-        <Card withBorder padding='xl' radius='md' shadow='xl'>
+      <Card withBorder padding='xl' radius='md' shadow='xl'>
+        <form onSubmit={form.onSubmit(handleSubmit)}>
           <Stack gap={20}>
             <TextInput
               withAsterisk
@@ -118,8 +118,8 @@ function AddMachineryPage() {
               </Button>
             </Group>
           </Stack>
-        </Card>
-      </form>
+        </form>
+      </Card>
     </Stack>
   );
 }

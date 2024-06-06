@@ -21,6 +21,7 @@ import { Route as AuthUsersIndexImport } from './routes/_auth/users/index'
 import { Route as AuthMachineryParametersIndexImport } from './routes/_auth/machinery-parameters/index'
 import { Route as AuthMachineriesIndexImport } from './routes/_auth/machineries/index'
 import { Route as AuthMachineryParametersAddImport } from './routes/_auth/machinery-parameters/add'
+import { Route as AuthMachineryParametersMachineryParameterIdEditImport } from './routes/_auth/machinery-parameters/$machineryParameterId.edit'
 import { Route as AuthMachineriesMachineryIdEditImport } from './routes/_auth/machineries/$machineryId.edit'
 
 // Create Virtual Routes
@@ -114,6 +115,12 @@ const AuthMachineryParametersAddRoute = AuthMachineryParametersAddImport.update(
     getParentRoute: () => AuthRoute,
   } as any,
 )
+
+const AuthMachineryParametersMachineryParameterIdEditRoute =
+  AuthMachineryParametersMachineryParameterIdEditImport.update({
+    path: '/machinery-parameters/$machineryParameterId/edit',
+    getParentRoute: () => AuthRoute,
+  } as any)
 
 const AuthMachineriesMachineryIdEditRoute =
   AuthMachineriesMachineryIdEditImport.update({
@@ -230,6 +237,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthMachineriesMachineryIdEditImport
       parentRoute: typeof AuthImport
     }
+    '/_auth/machinery-parameters/$machineryParameterId/edit': {
+      id: '/_auth/machinery-parameters/$machineryParameterId/edit'
+      path: '/machinery-parameters/$machineryParameterId/edit'
+      fullPath: '/machinery-parameters/$machineryParameterId/edit'
+      preLoaderRoute: typeof AuthMachineryParametersMachineryParameterIdEditImport
+      parentRoute: typeof AuthImport
+    }
   }
 }
 
@@ -248,6 +262,7 @@ export const routeTree = rootRoute.addChildren({
     AuthMachineriesIndexRoute,
     AuthMachineryParametersIndexRoute,
     AuthMachineriesMachineryIdEditRoute,
+    AuthMachineryParametersMachineryParameterIdEditRoute,
   }),
   GuestRoute: GuestRoute.addChildren({
     GuestResetPasswordRoute,
@@ -278,7 +293,8 @@ export const routeTree = rootRoute.addChildren({
         "/_auth/machineries/add",
         "/_auth/machineries/",
         "/_auth/machinery-parameters/",
-        "/_auth/machineries/$machineryId/edit"
+        "/_auth/machineries/$machineryId/edit",
+        "/_auth/machinery-parameters/$machineryParameterId/edit"
       ]
     },
     "/_guest": {
@@ -343,6 +359,10 @@ export const routeTree = rootRoute.addChildren({
     },
     "/_auth/machineries/$machineryId/edit": {
       "filePath": "_auth/machineries/$machineryId.edit.tsx",
+      "parent": "/_auth"
+    },
+    "/_auth/machinery-parameters/$machineryParameterId/edit": {
+      "filePath": "_auth/machinery-parameters/$machineryParameterId.edit.tsx",
       "parent": "/_auth"
     }
   }

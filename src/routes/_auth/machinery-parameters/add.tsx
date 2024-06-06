@@ -35,7 +35,7 @@ function AddMachineryParameterPage() {
 
       notifications.show({
         title: 'Успех',
-        message: 'Установка успешно добавлена в систему',
+        message: 'Параметр успешно добавлен в систему',
         color: 'teal',
         icon: <IconCheck size={16} />,
       });
@@ -89,8 +89,8 @@ function AddMachineryParameterPage() {
     <Stack align='center'>
       <Title ta='center'>Добавить новый параметр</Title>
 
-      <form onSubmit={form.onSubmit(handleSubmit)}>
-        <Card withBorder maw={550} padding='xl' radius='md' shadow='xl'>
+      <Card withBorder maw={550} padding='xl' radius='md' shadow='xl'>
+        <form onSubmit={form.onSubmit(handleSubmit)}>
           <Stack gap={20}>
             <TextInput
               withAsterisk
@@ -108,6 +108,7 @@ function AddMachineryParameterPage() {
               label='Тип параметра'
               placeholder='Выберите тип параметра'
               data={PARAMETER_TYPE_ITEMS}
+              disabled={isPending}
               key={form.key('parameterType')}
               {...form.getInputProps('parameterType')}
             />
@@ -117,6 +118,7 @@ function AddMachineryParameterPage() {
               label='Тип значения'
               placeholder='Выберите тип значения параметра'
               data={VALUE_TYPE_ITEMS}
+              disabled={isPending}
               key={form.key('valueType')}
               {...form.getInputProps('valueType')}
             />
@@ -130,6 +132,7 @@ function AddMachineryParameterPage() {
                 value: machinery.id.toString(),
                 label: machinery.name,
               }))}
+              disabled={isPending}
               key={form.key('machineryId')}
               {...form.getInputProps('machineryId')}
             />
@@ -148,8 +151,8 @@ function AddMachineryParameterPage() {
               </Button>
             </Group>
           </Stack>
-        </Card>
-      </form>
+        </form>
+      </Card>
     </Stack>
   );
 }

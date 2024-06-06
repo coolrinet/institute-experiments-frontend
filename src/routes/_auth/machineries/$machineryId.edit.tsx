@@ -12,7 +12,7 @@ import {
 import { useForm, zodResolver } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IconCheck, IconX } from '@tabler/icons-react';
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
 import { editMachinery } from '~/api/machineries/edit-machinery';
@@ -36,12 +36,20 @@ function EditMachineryPage() {
   const router = useRouter();
   const navigate = Route.useNavigate();
 
+  const queryClient = useQueryClient();
+
   const { data: machinery, isFetching } = useSuspenseQuery(getMachineryQueryOptions(machineryId));
 
   const { mutateAsync: editMachineryMutation, isPending } = useMutation({
     mutationFn: (data: MachineryData) => editMachinery(machineryId, data),
     onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ['machinery', machineryId],
+      });
+
       await router.invalidate();
+
+      await navigate({ to: '/machineries' });
 
       notifications.show({
         title: 'Успех',
@@ -49,8 +57,6 @@ function EditMachineryPage() {
         color: 'teal',
         icon: <IconCheck size={16} />,
       });
-
-      await navigate({ to: '/machineries' });
     },
     onError: error => {
       if (axios.isAxiosError<ApiErrorResponse>(error)) {
@@ -101,8 +107,9 @@ function EditMachineryPage() {
 
       <Box pos='relative'>
         <LoadingOverlay visible={isFetching} />
-        <form onSubmit={form.onSubmit(handleSubmit)}>
-          <Card withBorder padding='xl' radius='md' shadow='xl'>
+
+        <Card withBorder padding='xl' radius='md' shadow='xl'>
+          <form onSubmit={form.onSubmit(handleSubmit)}>
             <Stack gap={20}>
               <TextInput
                 withAsterisk
@@ -140,8 +147,8 @@ function EditMachineryPage() {
                 </Button>
               </Group>
             </Stack>
-          </Card>
-        </form>
+          </form>
+        </Card>
       </Box>
     </Stack>
   );
