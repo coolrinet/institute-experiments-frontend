@@ -20,6 +20,7 @@ import { Route as AuthUsersImport } from './routes/_auth/users'
 import { Route as AuthUsersIndexImport } from './routes/_auth/users/index'
 import { Route as AuthMachineryParametersIndexImport } from './routes/_auth/machinery-parameters/index'
 import { Route as AuthMachineriesIndexImport } from './routes/_auth/machineries/index'
+import { Route as AuthMachineryParametersAddImport } from './routes/_auth/machinery-parameters/add'
 import { Route as AuthMachineriesMachineryIdEditImport } from './routes/_auth/machineries/$machineryId.edit'
 
 // Create Virtual Routes
@@ -107,6 +108,13 @@ const AuthMachineriesAddLazyRoute = AuthMachineriesAddLazyImport.update({
   import('./routes/_auth/machineries/add.lazy').then((d) => d.Route),
 )
 
+const AuthMachineryParametersAddRoute = AuthMachineryParametersAddImport.update(
+  {
+    path: '/machinery-parameters/add',
+    getParentRoute: () => AuthRoute,
+  } as any,
+)
+
 const AuthMachineriesMachineryIdEditRoute =
   AuthMachineriesMachineryIdEditImport.update({
     path: '/machineries/$machineryId/edit',
@@ -173,6 +181,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthIndexLazyImport
       parentRoute: typeof AuthImport
     }
+    '/_auth/machinery-parameters/add': {
+      id: '/_auth/machinery-parameters/add'
+      path: '/machinery-parameters/add'
+      fullPath: '/machinery-parameters/add'
+      preLoaderRoute: typeof AuthMachineryParametersAddImport
+      parentRoute: typeof AuthImport
+    }
     '/_auth/machineries/add': {
       id: '/_auth/machineries/add'
       path: '/machineries/add'
@@ -228,6 +243,7 @@ export const routeTree = rootRoute.addChildren({
     }),
     AuthAboutLazyRoute,
     AuthIndexLazyRoute,
+    AuthMachineryParametersAddRoute,
     AuthMachineriesAddLazyRoute,
     AuthMachineriesIndexRoute,
     AuthMachineryParametersIndexRoute,
@@ -258,6 +274,7 @@ export const routeTree = rootRoute.addChildren({
         "/_auth/users",
         "/_auth/about",
         "/_auth/",
+        "/_auth/machinery-parameters/add",
         "/_auth/machineries/add",
         "/_auth/machineries/",
         "/_auth/machinery-parameters/",
@@ -298,6 +315,10 @@ export const routeTree = rootRoute.addChildren({
     },
     "/_auth/": {
       "filePath": "_auth/index.lazy.tsx",
+      "parent": "/_auth"
+    },
+    "/_auth/machinery-parameters/add": {
+      "filePath": "_auth/machinery-parameters/add.tsx",
       "parent": "/_auth"
     },
     "/_auth/machineries/add": {

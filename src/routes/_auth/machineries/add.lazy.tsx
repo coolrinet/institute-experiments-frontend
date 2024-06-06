@@ -80,7 +80,7 @@ function AddMachineryPage() {
       <Title ta='center'>Добавить новую установку</Title>
 
       <form onSubmit={form.onSubmit(handleSubmit)}>
-        <Card withBorder w={550} padding='xl' radius='md' shadow='xl'>
+        <Card withBorder padding='xl' radius='md' shadow='xl'>
           <Stack gap={20}>
             <TextInput
               withAsterisk
@@ -105,6 +105,14 @@ function AddMachineryPage() {
             />
 
             <Group justify='flex-end'>
+              <Button
+                variant='outline'
+                color='red'
+                disabled={isPending}
+                onClick={() => router.history.back()}
+              >
+                Отменить
+              </Button>
               <Button type='submit' disabled={isPending} loading={isPending}>
                 Добавить
               </Button>

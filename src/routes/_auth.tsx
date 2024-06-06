@@ -96,7 +96,7 @@ function AuthLayout() {
 
   return (
     <AppShell
-      padding='md'
+      padding='lg'
       header={{
         height: 60,
       }}

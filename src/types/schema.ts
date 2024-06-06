@@ -51,3 +51,18 @@ export const machinerySchema = z.object({
   description: z.string().nullable(),
 });
 export type MachineryData = z.infer<typeof machinerySchema>;
+
+export const machineryParameterSchema = z.object({
+  name: z
+    .string()
+    .min(1, 'Данное поле является обязательным')
+    .max(255, 'Длина данного поля не должна превышать 255 символов'),
+  parameterType: z.enum(['input', 'output'], {
+    required_error: 'Данное поле является обязательным',
+  }),
+  valueType: z.enum(['quantitative', 'quality'], {
+    required_error: 'Данное поле является обязательным',
+  }),
+  machineryId: z.coerce.number().nullable(),
+});
+export type MachineryParameterData = z.infer<typeof machineryParameterSchema>;

@@ -102,7 +102,7 @@ function EditMachineryPage() {
       <Box pos='relative'>
         <LoadingOverlay visible={isFetching} />
         <form onSubmit={form.onSubmit(handleSubmit)}>
-          <Card withBorder w={550} padding='xl' radius='md' shadow='xl'>
+          <Card withBorder padding='xl' radius='md' shadow='xl'>
             <Stack gap={20}>
               <TextInput
                 withAsterisk

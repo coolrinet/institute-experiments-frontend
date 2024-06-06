@@ -81,7 +81,7 @@ function AddNewUserPage() {
   return (
     <Stack align='center'>
       <Title ta='center'>Добавить нового пользователя</Title>
-      <Card withBorder w={550} padding='xl' radius='md' shadow='xl'>
+      <Card withBorder padding='xl' radius='md' shadow='xl'>
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <Stack gap={15}>
             <TextInput
@@ -125,8 +125,16 @@ function AddNewUserPage() {
               label='Предоставить права администратора'
             />
             <Group justify='flex-end'>
+              <Button
+                variant='outline'
+                color='red'
+                disabled={isPending}
+                onClick={() => router.history.back()}
+              >
+                Отменить
+              </Button>
               <Button type='submit' disabled={isPending} loading={isPending}>
-                Добавить пользователя
+                Добавить
               </Button>
             </Group>
           </Stack>

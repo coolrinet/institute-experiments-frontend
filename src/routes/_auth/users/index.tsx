@@ -25,7 +25,7 @@ import { ApiErrorResponse } from '~/types/api';
 
 export const Route = createFileRoute('/_auth/users/')({
   validateSearch: z.object({
-    page: z.number().optional().catch(1),
+    page: z.number().optional().default(1),
   }),
   loaderDeps: ({ search }) => search,
   loader: ({ context, deps }) => context.queryClient.ensureQueryData(getUsersQueryOptions(deps)),
@@ -77,7 +77,7 @@ function UsersPage() {
         icon: <IconCheck size={16} />,
       });
 
-      await navigate({ search: { ...search, page: search.page || 1 } });
+      await navigate({ search: { ...search, page: 1 } });
     } catch (error) {
       if (axios.isAxiosError<ApiErrorResponse>(error)) {
         if (error.response && error.status !== 500) {
@@ -130,27 +130,28 @@ function UsersPage() {
   return (
     <Stack>
       <Title>Список пользователей</Title>
-
-      {users.data.length > 0 ? (
-        <Box pos='relative'>
-          <LoadingOverlay visible={isFetching} />
-          <Table>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>Фамилия</Table.Th>
-                <Table.Th>Имя</Table.Th>
-                <Table.Th>Отчество</Table.Th>
-                <Table.Th>Email</Table.Th>
-                <Table.Th>Администратор?</Table.Th>
-                <Table.Th>Действия</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>{tableRows}</Table.Tbody>
-          </Table>
-        </Box>
-      ) : (
-        <Text>Пользователи отсутствуют</Text>
-      )}
+      <Box pos='relative'>
+        <LoadingOverlay visible={isFetching} />
+        {users.data.length ? (
+          <Table.ScrollContainer minWidth={500}>
+            <Table>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>Фамилия</Table.Th>
+                  <Table.Th>Имя</Table.Th>
+                  <Table.Th>Отчество</Table.Th>
+                  <Table.Th>Email</Table.Th>
+                  <Table.Th>Администратор?</Table.Th>
+                  <Table.Th />
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>{tableRows}</Table.Tbody>
+            </Table>
+          </Table.ScrollContainer>
+        ) : (
+          <Text>Пользователи отсутствуют</Text>
+        )}
+      </Box>
 
       <Group justify='space-between'>
         {totalPages && totalPages > 1 && (

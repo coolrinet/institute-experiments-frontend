@@ -85,9 +85,7 @@ function MachineriesPage() {
         icon: <IconCheck size={16} />,
       });
 
-      if (!machineries.data.length) {
-        await navigate({ search: { ...search, page: search.page - 1 } });
-      }
+      await navigate({ search: { ...search, page: 1 } });
     } catch (error) {
       if (axios.isAxiosError<ApiErrorResponse>(error)) {
         if (error.response && error.status !== 500) {
@@ -169,17 +167,19 @@ function MachineriesPage() {
             />
           </Card.Section>
           {machineries.data.length > 0 ? (
-            <Table mt='sm'>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>Название установки</Table.Th>
-                  <Table.Th>Описание</Table.Th>
-                  <Table.Th>Кем добавлена</Table.Th>
-                  <Table.Th>Действия</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>{tableRows}</Table.Tbody>
-            </Table>
+            <Table.ScrollContainer minWidth={500} mt='sm'>
+              <Table>
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th>Название установки</Table.Th>
+                    <Table.Th>Описание</Table.Th>
+                    <Table.Th>Кем добавлена</Table.Th>
+                    <Table.Th />
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>{tableRows}</Table.Tbody>
+              </Table>
+            </Table.ScrollContainer>
           ) : (
             <Text mt='sm'>Установки отсутствуют</Text>
           )}
