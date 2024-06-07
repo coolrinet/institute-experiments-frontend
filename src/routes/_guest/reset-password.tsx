@@ -1,16 +1,17 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Card, Center, Stack, TextInput, Title } from '@mantine/core';
-import { useForm, zodResolver } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IconCheck, IconLock, IconX } from '@tabler/icons-react';
+import { useMutation } from '@tanstack/react-query';
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
-import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { useAuth } from '~/hooks/use-auth';
 
 import { ApiErrorResponse } from '~/types/api';
-import { resetPasswordSchema } from '~/types/schema';
+import { ResetPasswordData, ResetPasswordInput, resetPasswordSchema } from '~/types/schema';
 
 export const Route = createFileRoute('/_guest/reset-password')({
   validateSearch: z.object({
@@ -32,29 +33,17 @@ function ResetPasswordPage() {
 
   const { passwordReset } = useAuth();
 
-  const [isPending, setIsPending] = useState(false);
-
-  const form = useForm({
-    mode: 'uncontrolled',
-    initialValues: {
+  const { handleSubmit, register, formState } = useForm<ResetPasswordInput>({
+    defaultValues: {
       password: '',
       passwordConfirmation: '',
     },
-    validate: zodResolver(resetPasswordSchema),
+    resolver: zodResolver(resetPasswordSchema),
   });
 
-  const handleResetPassword = async (values: typeof form.values) => {
-    setIsPending(true);
-
-    const data = {
-      ...values,
-      token: search.token,
-      email: search.email,
-    };
-
-    try {
-      await passwordReset(data);
-
+  const { mutateAsync: resetPasswordMutation, isPending } = useMutation({
+    mutationFn: (data: ResetPasswordData) => passwordReset(data),
+    onSuccess: async () => {
       await router.invalidate();
 
       await navigate({ to: '/login' });
@@ -65,7 +54,8 @@ function ResetPasswordPage() {
         color: 'teal',
         icon: <IconCheck size={16} />,
       });
-    } catch (error) {
+    },
+    onError: error => {
       if (axios.isAxiosError<ApiErrorResponse>(error)) {
         if (error.response && error.status !== 500) {
           notifications.show({
@@ -92,9 +82,16 @@ function ResetPasswordPage() {
           icon: <IconX size={16} />,
         });
       }
-    } finally {
-      setIsPending(false);
-    }
+    },
+  });
+  const handleResetPassword = async (values: ResetPasswordInput) => {
+    const data = {
+      ...values,
+      token: search.token,
+      email: search.email,
+    };
+
+    await resetPasswordMutation(data);
   };
 
   return (
@@ -102,27 +99,27 @@ function ResetPasswordPage() {
       <Stack gap={20} align='center'>
         <Title ta='center'>Сброс пароля</Title>
         <Card withBorder w={450} padding='xl' radius='md' shadow='xl'>
-          <form onSubmit={form.onSubmit(handleResetPassword)}>
+          <form onSubmit={handleSubmit(handleResetPassword)}>
             <Stack gap={15}>
               <TextInput
+                {...register('password')}
                 label='Пароль'
                 leftSection={<IconLock size={16} />}
                 leftSectionPointerEvents='none'
                 type='password'
                 placeholder='Введите новый пароль'
-                key={form.key('password')}
                 disabled={isPending}
-                {...form.getInputProps('password')}
+                error={formState.errors.password?.message}
               />
               <TextInput
+                {...register('passwordConfirmation')}
                 label='Подтверждение пароля'
                 leftSection={<IconLock size={16} />}
                 leftSectionPointerEvents='none'
                 type='password'
                 placeholder='Подтвердите пароль'
-                key={form.key('passwordConfirmation')}
                 disabled={isPending}
-                {...form.getInputProps('passwordConfirmation')}
+                error={formState.errors.passwordConfirmation?.message}
               />
               <Button type='submit' fullWidth loading={isPending} disabled={isPending}>
                 Сменить пароль

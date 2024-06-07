@@ -1,3 +1,4 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Anchor,
   Button,
@@ -9,17 +10,17 @@ import {
   TextInput,
   Title,
 } from '@mantine/core';
-import { useForm, zodResolver } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IconAt, IconCheck, IconLock, IconX } from '@tabler/icons-react';
+import { useMutation } from '@tanstack/react-query';
 import { Link, createLazyFileRoute, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
-import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 
 import { useAuth } from '~/hooks/use-auth';
 
 import { ApiErrorResponse } from '~/types/api';
-import { loginSchema } from '~/types/schema';
+import { LoginData, loginSchema } from '~/types/schema';
 
 export const Route = createLazyFileRoute('/_guest/login')({
   component: LoginPage,
@@ -34,23 +35,18 @@ function LoginPage() {
 
   const { login } = useAuth();
 
-  const [isPending, setIsPending] = useState(false);
-
-  const form = useForm({
-    mode: 'uncontrolled',
-    initialValues: {
+  const { register, handleSubmit, resetField, formState } = useForm<LoginData>({
+    defaultValues: {
       email: '',
       password: '',
       shouldRemember: false,
     },
-    validate: zodResolver(loginSchema),
+    resolver: zodResolver(loginSchema),
   });
 
-  const handleLogin = async (values: typeof form.values) => {
-    setIsPending(true);
-    try {
-      await login(values);
-
+  const { mutateAsync: loginMutation, isPending } = useMutation({
+    mutationFn: (data: LoginData) => login(data),
+    onSuccess: async () => {
       await router.invalidate();
 
       await navigate({ to: search.redirect || fallbackRedirect });
@@ -61,7 +57,8 @@ function LoginPage() {
         color: 'teal',
         icon: <IconCheck size={16} />,
       });
-    } catch (error) {
+    },
+    onError: error => {
       if (axios.isAxiosError<ApiErrorResponse>(error)) {
         if (error.response && error.status !== 500) {
           notifications.show({
@@ -88,10 +85,13 @@ function LoginPage() {
           icon: <IconX size={16} />,
         });
       }
-    } finally {
-      form.setFieldValue('password', '');
-      setIsPending(false);
-    }
+
+      resetField('password');
+    },
+  });
+
+  const handleLogin = async (data: LoginData) => {
+    await loginMutation(data);
   };
 
   return (
@@ -99,34 +99,33 @@ function LoginPage() {
       <Stack gap={20} align='center'>
         <Title ta='center'>Авторизация</Title>
         <Card withBorder w={450} padding='xl' radius='md' shadow='xl'>
-          <form onSubmit={form.onSubmit(handleLogin)}>
+          <form onSubmit={handleSubmit(handleLogin)}>
             <Stack gap={15}>
               <TextInput
+                {...register('email')}
                 label='Email'
                 leftSection={<IconAt size={16} />}
                 leftSectionPointerEvents='none'
                 type='email'
                 placeholder='Введите ваш email'
-                key={form.key('email')}
                 disabled={isPending}
-                {...form.getInputProps('email')}
+                error={formState.errors.email?.message}
               />
               <TextInput
+                {...register('password')}
                 label='Пароль'
                 leftSection={<IconLock size={16} />}
                 leftSectionPointerEvents='none'
                 type='password'
                 placeholder='Введите ваш пароль'
-                key={form.key('password')}
                 disabled={isPending}
-                {...form.getInputProps('password')}
+                error={formState.errors.password?.message}
               />
               <Group justify='space-between'>
                 <Checkbox
                   label='Запомнить меня'
                   disabled={isPending}
-                  key={form.key('remember')}
-                  {...form.getInputProps('shouldRemember')}
+                  {...register('shouldRemember')}
                 />
                 <Anchor
                   underline='hover'

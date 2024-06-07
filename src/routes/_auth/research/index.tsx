@@ -15,7 +15,7 @@ import {
 import { useDebouncedCallback } from '@mantine/hooks';
 import { IconSearch } from '@tabler/icons-react';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute } from '@tanstack/react-router';
+import { Link, createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
 import { getMachineriesQueryOptions } from '~/api/machineries/get-machineries';
 import { getAllResearchQueryOptions } from '~/api/research/get-all-research';
@@ -80,8 +80,8 @@ function ResearchPage() {
     return (
       <Table.Tr key={item.id}>
         <Table.Td>{item.name}</Table.Td>
-        <Table.Td>{item.description}</Table.Td>
-        <Table.Td>{item.lastExperimentDate}</Table.Td>
+        <Table.Td>{item.description || '-'}</Table.Td>
+        <Table.Td>{item.lastExperimentDate || '-'}</Table.Td>
         <Table.Td>{item.machinery.name}</Table.Td>
         <Table.Td>{userFullName}</Table.Td>
       </Table.Tr>
@@ -140,7 +140,9 @@ function ResearchPage() {
         {totalPages && totalPages > 1 && (
           <Pagination value={search.page} total={totalPages} onChange={onPageChange} />
         )}
-        <Button>Добавить новое исследование</Button>
+        <Button renderRoot={props => <Link to='/research/add' {...props} />}>
+          Добавить новое исследование
+        </Button>
       </Group>
     </Stack>
   );

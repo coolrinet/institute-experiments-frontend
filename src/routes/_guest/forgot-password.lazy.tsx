@@ -1,15 +1,16 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Card, Center, Group, Stack, TextInput, Title } from '@mantine/core';
-import { useForm, zodResolver } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IconArrowLeft, IconAt, IconCheck, IconX } from '@tabler/icons-react';
+import { useMutation } from '@tanstack/react-query';
 import { createLazyFileRoute, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
-import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 
 import { useAuth } from '~/hooks/use-auth';
 
 import { ApiErrorResponse } from '~/types/api';
-import { forgotPasswordSchema } from '~/types/schema';
+import { ForgotPasswordData, forgotPasswordSchema } from '~/types/schema';
 
 export const Route = createLazyFileRoute('/_guest/forgot-password')({
   component: ForgotPasswordPage,
@@ -22,22 +23,16 @@ function ForgotPasswordPage() {
 
   const { forgotPassword } = useAuth();
 
-  const [isPending, setIsPending] = useState(false);
-
-  const form = useForm({
-    mode: 'uncontrolled',
-    initialValues: {
+  const { handleSubmit, register, formState } = useForm<ForgotPasswordData>({
+    defaultValues: {
       email: '',
     },
-    validate: zodResolver(forgotPasswordSchema),
+    resolver: zodResolver(forgotPasswordSchema),
   });
 
-  const handleForgotPassword = async (values: typeof form.values) => {
-    setIsPending(true);
-
-    try {
-      await forgotPassword(values);
-
+  const { mutateAsync: forgotPasswordMutation, isPending } = useMutation({
+    mutationFn: (data: ForgotPasswordData) => forgotPassword(data),
+    onSuccess: async () => {
       await router.invalidate();
 
       await navigate({ to: '/login', search });
@@ -49,7 +44,8 @@ function ForgotPasswordPage() {
         color: 'teal',
         icon: <IconCheck size={16} />,
       });
-    } catch (error) {
+    },
+    onError: error => {
       if (axios.isAxiosError<ApiErrorResponse>(error)) {
         if (error.response && error.status !== 500) {
           notifications.show({
@@ -76,9 +72,11 @@ function ForgotPasswordPage() {
           icon: <IconX size={16} />,
         });
       }
-    } finally {
-      setIsPending(false);
-    }
+    },
+  });
+
+  const handleForgotPassword = async (data: ForgotPasswordData) => {
+    await forgotPasswordMutation(data);
   };
 
   return (
@@ -86,17 +84,17 @@ function ForgotPasswordPage() {
       <Stack gap={20} align='center'>
         <Title ta='center'>Восстановление пароля</Title>
         <Card withBorder w={450} padding='xl' radius='md' shadow='xl'>
-          <form onSubmit={form.onSubmit(handleForgotPassword)}>
+          <form onSubmit={handleSubmit(handleForgotPassword)}>
             <Stack gap={15}>
               <TextInput
+                {...register('email')}
                 label='Email'
                 leftSection={<IconAt size={16} />}
                 leftSectionPointerEvents='none'
                 type='email'
                 placeholder='Введите ваш email'
-                key={form.key('email')}
                 disabled={isPending}
-                {...form.getInputProps('email')}
+                error={formState.errors.email?.message}
               />
               <Group justify='space-between'>
                 <Button

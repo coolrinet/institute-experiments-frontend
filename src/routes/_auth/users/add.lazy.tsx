@@ -1,10 +1,11 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Card, Checkbox, Group, Stack, TextInput, Title } from '@mantine/core';
-import { useForm, zodResolver } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IconCheck, IconX } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
 import { createLazyFileRoute, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
+import { useForm } from 'react-hook-form';
 import { addUser } from '~/api/users/add-user';
 
 import { ApiErrorResponse } from '~/types/api';
@@ -62,67 +63,67 @@ function AddNewUserPage() {
     },
   });
 
-  const handleSubmit = async (data: AddUserData) => {
+  const onSubmit = async (data: AddUserData) => {
     await addUserMutation(data);
   };
 
-  const form = useForm<AddUserData>({
-    mode: 'uncontrolled',
-    initialValues: {
+  const { handleSubmit, register, formState } = useForm<AddUserData>({
+    defaultValues: {
       lastName: '',
       firstName: '',
       middleName: '',
       email: '',
       isAdmin: false,
     },
-    validate: zodResolver(addUserSchema),
+    resolver: zodResolver(addUserSchema),
   });
 
   return (
     <Stack align='center'>
       <Title ta='center'>Добавить нового пользователя</Title>
       <Card withBorder padding='xl' radius='md' shadow='xl'>
-        <form onSubmit={form.onSubmit(handleSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <Stack gap={15}>
             <TextInput
+              {...register('lastName')}
               type='text'
               withAsterisk
-              key={form.key('lastName')}
-              {...form.getInputProps('lastName')}
               label='Фамилия'
               placeholder='Иванов'
               disabled={isPending}
+              error={formState.errors.lastName?.message}
             />
             <TextInput
+              {...register('firstName')}
               type='text'
               withAsterisk
-              key={form.key('firstName')}
-              {...form.getInputProps('firstName')}
               label='Имя'
               placeholder='Иван'
               disabled={isPending}
+              error={formState.errors.firstName?.message}
             />
             <TextInput
+              {...register('middleName')}
               type='text'
-              key={form.key('middleName')}
-              {...form.getInputProps('middleName')}
               label='Отчество'
               placeholder='Иванович'
               disabled={isPending}
+              error={formState.errors.middleName?.message}
             />
             <TextInput
+              {...register('email')}
               type='email'
               withAsterisk
-              key={form.key('email')}
-              {...form.getInputProps('email')}
               label='Электронная почта'
               placeholder='LpH1b@example.com'
               disabled={isPending}
+              error={formState.errors.email?.message}
             />
             <Checkbox
-              key={form.key('isAdmin')}
-              {...form.getInputProps('isAdmin')}
+              {...register('isAdmin')}
               label='Предоставить права администратора'
+              disabled={isPending}
+              error={formState.errors.isAdmin?.message}
             />
             <Group justify='flex-end'>
               <Button

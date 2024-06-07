@@ -1,3 +1,4 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Box,
   Button,
@@ -9,12 +10,12 @@ import {
   TextInput,
   Title,
 } from '@mantine/core';
-import { useForm, zodResolver } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IconCheck, IconX } from '@tabler/icons-react';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
+import { Controller, useForm } from 'react-hook-form';
 import { getMachineriesQueryOptions } from '~/api/machineries/get-machineries';
 import { editMachineryParameter } from '~/api/machinery-parameters/edit-machinery-parameter';
 import { getMachineryParameterQueryOptions } from '~/api/machinery-parameters/get-machinery-parameter';
@@ -104,19 +105,18 @@ function EditMachineryParameterPage() {
     },
   });
 
-  const handleSubmit = async (data: MachineryParameterData) => {
+  const onSubmit = async (data: MachineryParameterData) => {
     await editMachineryParameterMutation(data);
   };
 
-  const form = useForm<MachineryParameterData>({
-    mode: 'uncontrolled',
-    initialValues: {
+  const { handleSubmit, register, control, formState } = useForm<MachineryParameterData>({
+    defaultValues: {
       name: machineryParameter.data.name,
       parameterType: machineryParameter.data.parameterType,
       valueType: machineryParameter.data.valueType,
       machineryId: machineryParameter.data.machinery?.id || null,
     },
-    validate: zodResolver(machineryParameterSchema),
+    resolver: zodResolver(machineryParameterSchema),
   });
 
   return (
@@ -127,52 +127,70 @@ function EditMachineryParameterPage() {
         <LoadingOverlay visible={isMachineriesFetching || isMachineryParameterFetching} />
 
         <Card withBorder maw={550} padding='xl' radius='md' shadow='xl'>
-          <form onSubmit={form.onSubmit(handleSubmit)}>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <Stack gap={20}>
               <TextInput
+                {...register('name')}
                 withAsterisk
                 label='Название параметра'
                 placeholder='Введите название параметра'
                 type='text'
                 description='Название параметра должно быть уникальным'
                 disabled={isPending}
-                key={form.key('name')}
-                {...form.getInputProps('name')}
+                error={formState.errors.name?.message}
               />
 
-              <Select
-                withAsterisk
-                label='Тип параметра'
-                placeholder='Выберите тип параметра'
-                data={PARAMETER_TYPE_ITEMS}
-                disabled={isPending}
-                key={form.key('parameterType')}
-                {...form.getInputProps('parameterType')}
+              <Controller
+                name='parameterType'
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    withAsterisk
+                    label='Тип параметра'
+                    placeholder='Выберите тип параметра'
+                    data={PARAMETER_TYPE_ITEMS}
+                    disabled={isPending}
+                    error={formState.errors.parameterType?.message}
+                  />
+                )}
               />
 
-              <Select
-                withAsterisk
-                label='Тип значения'
-                placeholder='Выберите тип значения параметра'
-                data={VALUE_TYPE_ITEMS}
-                disabled={isPending}
-                key={form.key('valueType')}
-                {...form.getInputProps('valueType')}
+              <Controller
+                name='valueType'
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    withAsterisk
+                    label='Тип значения'
+                    placeholder='Выберите тип значения параметра'
+                    data={VALUE_TYPE_ITEMS}
+                    disabled={isPending}
+                    error={formState.errors.valueType?.message}
+                  />
+                )}
               />
 
-              <Select
-                label='Установка'
-                description='Если не выбрана установка, параметр будет общим для всех установок'
-                placeholder='Выберите установку'
-                clearable
-                data={machineries.data.map(machinery => ({
-                  value: machinery.id.toString(),
-                  label: machinery.name,
-                }))}
-                disabled={isPending}
-                key={form.key('machineryId')}
-                value={form.values.machineryId?.toString()}
-                {...form.getInputProps('machineryId')}
+              <Controller
+                name='machineryId'
+                control={control}
+                render={({ field: { value, ...field } }) => (
+                  <Select
+                    {...field}
+                    label='Установка'
+                    description='Если не выбрана установка, параметр будет общим для всех установок'
+                    placeholder='Выберите установку'
+                    clearable
+                    data={machineries.data.map(machinery => ({
+                      value: machinery.id.toString(),
+                      label: machinery.name,
+                    }))}
+                    disabled={isPending}
+                    value={value?.toString()}
+                    error={formState.errors.machineryId?.message}
+                  />
+                )}
               />
 
               <Group justify='flex-end'>

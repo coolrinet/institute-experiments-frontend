@@ -21,6 +21,7 @@ import { Route as AuthUsersIndexImport } from './routes/_auth/users/index'
 import { Route as AuthResearchIndexImport } from './routes/_auth/research/index'
 import { Route as AuthMachineryParametersIndexImport } from './routes/_auth/machinery-parameters/index'
 import { Route as AuthMachineriesIndexImport } from './routes/_auth/machineries/index'
+import { Route as AuthResearchAddImport } from './routes/_auth/research/add'
 import { Route as AuthMachineryParametersAddImport } from './routes/_auth/machinery-parameters/add'
 import { Route as AuthMachineryParametersMachineryParameterIdEditImport } from './routes/_auth/machinery-parameters/$machineryParameterId.edit'
 import { Route as AuthMachineriesMachineryIdEditImport } from './routes/_auth/machineries/$machineryId.edit'
@@ -115,6 +116,11 @@ const AuthMachineriesAddLazyRoute = AuthMachineriesAddLazyImport.update({
   import('./routes/_auth/machineries/add.lazy').then((d) => d.Route),
 )
 
+const AuthResearchAddRoute = AuthResearchAddImport.update({
+  path: '/research/add',
+  getParentRoute: () => AuthRoute,
+} as any)
+
 const AuthMachineryParametersAddRoute = AuthMachineryParametersAddImport.update(
   {
     path: '/machinery-parameters/add',
@@ -201,6 +207,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthMachineryParametersAddImport
       parentRoute: typeof AuthImport
     }
+    '/_auth/research/add': {
+      id: '/_auth/research/add'
+      path: '/research/add'
+      fullPath: '/research/add'
+      preLoaderRoute: typeof AuthResearchAddImport
+      parentRoute: typeof AuthImport
+    }
     '/_auth/machineries/add': {
       id: '/_auth/machineries/add'
       path: '/machineries/add'
@@ -271,6 +284,7 @@ export const routeTree = rootRoute.addChildren({
     AuthAboutLazyRoute,
     AuthIndexLazyRoute,
     AuthMachineryParametersAddRoute,
+    AuthResearchAddRoute,
     AuthMachineriesAddLazyRoute,
     AuthMachineriesIndexRoute,
     AuthMachineryParametersIndexRoute,
@@ -304,6 +318,7 @@ export const routeTree = rootRoute.addChildren({
         "/_auth/about",
         "/_auth/",
         "/_auth/machinery-parameters/add",
+        "/_auth/research/add",
         "/_auth/machineries/add",
         "/_auth/machineries/",
         "/_auth/machinery-parameters/",
@@ -350,6 +365,10 @@ export const routeTree = rootRoute.addChildren({
     },
     "/_auth/machinery-parameters/add": {
       "filePath": "_auth/machinery-parameters/add.tsx",
+      "parent": "/_auth"
+    },
+    "/_auth/research/add": {
+      "filePath": "_auth/research/add.tsx",
       "parent": "/_auth"
     },
     "/_auth/machineries/add": {

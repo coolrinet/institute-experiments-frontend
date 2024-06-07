@@ -19,6 +19,7 @@ export const resetPasswordSchema = z
     message: 'Пароли не совпадают',
     path: ['passwordConfirmation'],
   });
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 export type ResetPasswordData = z.infer<typeof resetPasswordSchema> & {
   token: string;
   email: string;
@@ -66,3 +67,37 @@ export const machineryParameterSchema = z.object({
   machineryId: z.coerce.number().nullable(),
 });
 export type MachineryParameterData = z.infer<typeof machineryParameterSchema>;
+
+const researchBaseSchema = z.object({
+  name: z
+    .string()
+    .min(1, 'Данное поле является обязательным')
+    .max(255, 'Длина данного поля не должна превышать 255 символов'),
+  description: z.string().nullable(),
+  machineryId: z.coerce
+    .number()
+    .nullable()
+    .transform((value, ctx): number => {
+      if (value === null) {
+        ctx.addIssue({
+          code: 'invalid_type',
+          message: 'Данное поле является обязательным',
+          expected: 'number',
+          received: 'null',
+        });
+        return z.NEVER;
+      }
+      return value;
+    }),
+});
+const privateResearchSchema = z.object({
+  isPublic: z.literal(false),
+  participants: z.array(z.coerce.number()).optional(),
+});
+const publicResearchSchema = z.object({
+  isPublic: z.literal(true),
+});
+export const researchSchema = z
+  .discriminatedUnion('isPublic', [publicResearchSchema, privateResearchSchema])
+  .and(researchBaseSchema);
+export type ResearchData = z.infer<typeof researchSchema>;

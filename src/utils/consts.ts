@@ -7,3 +7,8 @@ export const VALUE_TYPE_ITEMS = [
   { value: 'quantitative', label: 'количественный' },
   { value: 'quality', label: 'качественный' },
 ];
+
+export const IS_RESEARCH_PUBLIC_ITEMS = [
+  { value: 'false', label: 'приватный' },
+  { value: 'true', label: 'публичный' },
+];

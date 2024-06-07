@@ -1,10 +1,11 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Card, Group, Stack, TextInput, Textarea, Title } from '@mantine/core';
-import { useForm, zodResolver } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IconCheck, IconX } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
 import { createLazyFileRoute, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
+import { useForm } from 'react-hook-form';
 import { addMachinery } from '~/api/machineries/add-machinery';
 
 import { ApiErrorResponse } from '~/types/api';
@@ -62,17 +63,16 @@ function AddMachineryPage() {
     },
   });
 
-  const handleSubmit = async (data: MachineryData) => {
+  const onSubmit = async (data: MachineryData) => {
     await addMachineryMutation(data);
   };
 
-  const form = useForm<MachineryData>({
-    mode: 'uncontrolled',
-    initialValues: {
+  const { handleSubmit, register, formState } = useForm<MachineryData>({
+    defaultValues: {
       name: '',
       description: '',
     },
-    validate: zodResolver(machinerySchema),
+    resolver: zodResolver(machinerySchema),
   });
 
   return (
@@ -80,28 +80,28 @@ function AddMachineryPage() {
       <Title ta='center'>Добавить новую установку</Title>
 
       <Card withBorder padding='xl' radius='md' shadow='xl'>
-        <form onSubmit={form.onSubmit(handleSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <Stack gap={20}>
             <TextInput
+              {...register('name')}
               withAsterisk
               label='Название установки'
               placeholder='Введите название установки'
               type='text'
               description='Название установки должно быть уникальным'
               disabled={isPending}
-              key={form.key('name')}
-              {...form.getInputProps('name')}
+              error={formState.errors.name?.message}
             />
 
             <Textarea
+              {...register('description')}
               label='Описание'
               placeholder='Введите описание установки'
               autosize
               minRows={4}
               maxRows={6}
               disabled={isPending}
-              key={form.key('description')}
-              {...form.getInputProps('description')}
+              error={formState.errors.description?.message}
             />
 
             <Group justify='flex-end'>

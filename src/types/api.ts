@@ -51,7 +51,7 @@ export type Research = ApiResponseBase<{
   id: number;
   name: string;
   description: string | null;
-  lastExperimentDate: string;
+  lastExperimentDate: string | null;
   machinery: Machinery['data'];
   parameters?: Array<MachineryParameter['data']>;
   author: User['data'];
