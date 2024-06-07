@@ -1,4 +1,5 @@
 import {
+  ActionIcon,
   Box,
   Button,
   Card,
@@ -13,14 +14,21 @@ import {
   Title,
 } from '@mantine/core';
 import { useDebouncedCallback } from '@mantine/hooks';
-import { IconSearch } from '@tabler/icons-react';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { Link, createFileRoute } from '@tanstack/react-router';
+import { notifications } from '@mantine/notifications';
+import { IconCheck, IconSearch, IconTrash, IconX } from '@tabler/icons-react';
+import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { Link, createFileRoute, useRouter } from '@tanstack/react-router';
+import axios from 'axios';
 import { z } from 'zod';
 import { getMachineriesQueryOptions } from '~/api/machineries/get-machineries';
+import { deleteResearch } from '~/api/research/delete-research';
 import { getAllResearchQueryOptions } from '~/api/research/get-all-research';
 
 import PageLoader from '~/components/Loader';
+
+import { useAuth } from '~/hooks/use-auth';
+
+import { ApiErrorResponse } from '~/types/api';
 
 export const Route = createFileRoute('/_auth/research/')({
   validateSearch: z.object({
@@ -40,6 +48,9 @@ export const Route = createFileRoute('/_auth/research/')({
 function ResearchPage() {
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
+  const router = useRouter();
+
+  const queryClient = useQueryClient();
 
   const { data: machineries, isFetching: isMachineriesFetching } = useSuspenseQuery(
     getMachineriesQueryOptions({})
@@ -48,6 +59,8 @@ function ResearchPage() {
   const { data: research, isFetching: isResearchFetching } = useSuspenseQuery(
     getAllResearchQueryOptions(search)
   );
+
+  const { user } = useAuth();
 
   const totalPages = research.meta!.last_page;
 
@@ -70,6 +83,70 @@ function ResearchPage() {
     await onParamChange('name', name);
   }, 200);
 
+  const handleDelete = async (researchId: number) => {
+    const researchItem = research.data.find(item => item.id === researchId);
+
+    if (researchItem?.author?.id !== user?.data.id) {
+      notifications.show({
+        title: 'Неудача',
+        message: 'Нельзя удалить исследование, созданное другим пользователем',
+        color: 'red',
+        icon: <IconX size={16} />,
+      });
+      return;
+    }
+
+    const dialogResult = confirm('Вы действительно хотите удалить исследование?');
+
+    if (!dialogResult) {
+      return;
+    }
+
+    try {
+      await deleteResearch(researchId);
+
+      await queryClient.invalidateQueries({ queryKey: ['research'] });
+
+      await router.invalidate();
+
+      notifications.show({
+        title: 'Успех',
+        message: 'Исследование успешно удалено',
+        color: 'teal',
+        icon: <IconCheck size={16} />,
+      });
+
+      await navigate({ search: { ...search, page: 1 } });
+    } catch (error) {
+      if (axios.isAxiosError<ApiErrorResponse>(error)) {
+        if (error.response && error.status !== 500) {
+          notifications.show({
+            title: 'Произошла ошибка',
+            message: error.response.data.message,
+            color: 'red',
+            icon: <IconX size={16} />,
+          });
+        } else {
+          console.error(error);
+          notifications.show({
+            title: 'Произошла ошибка',
+            message: 'Произошла непредвиденная ошибка',
+            color: 'red',
+            icon: <IconX size={16} />,
+          });
+        }
+      } else {
+        console.error(error);
+        notifications.show({
+          title: 'Произошла ошибка',
+          message: 'Произошла непредвиденная ошибка',
+          color: 'red',
+          icon: <IconX size={16} />,
+        });
+      }
+    }
+  };
+
   const tableRows = research.data.map(item => {
     let userFullName = `${item.author.lastName} ${item.author.firstName[0]}.`;
 
@@ -84,6 +161,24 @@ function ResearchPage() {
         <Table.Td>{item.lastExperimentDate || '-'}</Table.Td>
         <Table.Td>{item.machinery.name}</Table.Td>
         <Table.Td>{userFullName}</Table.Td>
+        <Table.Td>
+          <ActionIcon.Group>
+            {/* <ActionIcon
+              renderRoot={props => (
+                <Link
+                  to='/machinery-parameters/$machineryParameterId/edit'
+                  params={{ machineryParameterId: machineryParameter.id }}
+                  {...props}
+                />
+              )}
+            >
+              <IconEdit size={16} />
+            </ActionIcon> */}
+            <ActionIcon color='red' onClick={() => handleDelete(item.id)}>
+              <IconTrash size={16} />
+            </ActionIcon>
+          </ActionIcon.Group>
+        </Table.Td>
       </Table.Tr>
     );
   });
@@ -126,6 +221,7 @@ function ResearchPage() {
                     <Table.Th>Дата последнего эксперимента</Table.Th>
                     <Table.Th>Используемая установка</Table.Th>
                     <Table.Th>Автор</Table.Th>
+                    <Table.Th />
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>{tableRows}</Table.Tbody>
