@@ -19,12 +19,12 @@ export type User = ApiResponseBase<{
   isAdmin?: boolean;
 }>;
 
-export type Users = ApiResponseBase<User['data'][]>;
+export type Users = ApiResponseBase<Array<User['data']>>;
 
 export type Machinery = ApiResponseBase<{
   id: number;
   name: string;
-  description: string;
+  description: string | null;
 }>;
 
 export type Machineries = ApiResponseBase<
@@ -46,3 +46,15 @@ export type MachineryParameter = ApiResponseBase<{
 export type MachineryParameters = ApiResponseBase<
   Array<MachineryParameter['data'] & { user: User['data'] }>
 >;
+
+export type Research = ApiResponseBase<{
+  id: number;
+  name: string;
+  description: string | null;
+  lastExperimentDate: string;
+  machinery: Machinery['data'];
+  parameters?: Array<MachineryParameter['data']>;
+  author: User['data'];
+  participants?: Array<User['data']>;
+}>;
+export type ResearchList = ApiResponseBase<Array<Research['data']>>;

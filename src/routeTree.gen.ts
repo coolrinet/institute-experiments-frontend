@@ -18,6 +18,7 @@ import { Route as AuthImport } from './routes/_auth'
 import { Route as GuestResetPasswordImport } from './routes/_guest/reset-password'
 import { Route as AuthUsersImport } from './routes/_auth/users'
 import { Route as AuthUsersIndexImport } from './routes/_auth/users/index'
+import { Route as AuthResearchIndexImport } from './routes/_auth/research/index'
 import { Route as AuthMachineryParametersIndexImport } from './routes/_auth/machinery-parameters/index'
 import { Route as AuthMachineriesIndexImport } from './routes/_auth/machineries/index'
 import { Route as AuthMachineryParametersAddImport } from './routes/_auth/machinery-parameters/add'
@@ -82,6 +83,11 @@ const AuthUsersRoute = AuthUsersImport.update({
 const AuthUsersIndexRoute = AuthUsersIndexImport.update({
   path: '/',
   getParentRoute: () => AuthUsersRoute,
+} as any)
+
+const AuthResearchIndexRoute = AuthResearchIndexImport.update({
+  path: '/research/',
+  getParentRoute: () => AuthRoute,
 } as any)
 
 const AuthMachineryParametersIndexRoute =
@@ -223,6 +229,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthMachineryParametersIndexImport
       parentRoute: typeof AuthImport
     }
+    '/_auth/research/': {
+      id: '/_auth/research/'
+      path: '/research'
+      fullPath: '/research'
+      preLoaderRoute: typeof AuthResearchIndexImport
+      parentRoute: typeof AuthImport
+    }
     '/_auth/users/': {
       id: '/_auth/users/'
       path: '/'
@@ -261,6 +274,7 @@ export const routeTree = rootRoute.addChildren({
     AuthMachineriesAddLazyRoute,
     AuthMachineriesIndexRoute,
     AuthMachineryParametersIndexRoute,
+    AuthResearchIndexRoute,
     AuthMachineriesMachineryIdEditRoute,
     AuthMachineryParametersMachineryParameterIdEditRoute,
   }),
@@ -293,6 +307,7 @@ export const routeTree = rootRoute.addChildren({
         "/_auth/machineries/add",
         "/_auth/machineries/",
         "/_auth/machinery-parameters/",
+        "/_auth/research/",
         "/_auth/machineries/$machineryId/edit",
         "/_auth/machinery-parameters/$machineryParameterId/edit"
       ]
@@ -351,6 +366,10 @@ export const routeTree = rootRoute.addChildren({
     },
     "/_auth/machinery-parameters/": {
       "filePath": "_auth/machinery-parameters/index.tsx",
+      "parent": "/_auth"
+    },
+    "/_auth/research/": {
+      "filePath": "_auth/research/index.tsx",
       "parent": "/_auth"
     },
     "/_auth/users/": {

@@ -24,6 +24,8 @@ import { getMachineriesQueryOptions } from '~/api/machineries/get-machineries';
 
 import PageLoader from '~/components/Loader';
 
+import { useAuth } from '~/hooks/use-auth';
+
 import { ApiErrorResponse } from '~/types/api';
 
 export const Route = createFileRoute('/_auth/machineries/')({
@@ -42,6 +44,8 @@ function MachineriesPage() {
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
   const router = useRouter();
+
+  const { user } = useAuth();
 
   const queryClient = useQueryClient();
   const { data: machineries, isFetching } = useSuspenseQuery(getMachineriesQueryOptions(search));
@@ -65,6 +69,19 @@ function MachineriesPage() {
   }, 200);
 
   const handleDelete = async (machineryId: number) => {
+    const machinery = machineries.data.find(machinery => machinery.id === machineryId);
+
+    if (machinery?.user.id !== user?.data.id) {
+      notifications.show({
+        title: 'Неудача',
+        message: 'Нельзя удалить установку, добавленную другим пользователем',
+        color: 'red',
+        icon: <IconX size={16} />,
+      });
+
+      return;
+    }
+
     const dialogResult = confirm('Вы действительно хотите удалить установку?');
 
     if (!dialogResult) {

@@ -5,6 +5,7 @@ import {
   IconBuildingFactory,
   IconCheck,
   IconHome,
+  IconReportSearch,
   IconSettings,
   IconUsers,
   IconX,
@@ -130,6 +131,11 @@ function AuthLayout() {
           leftSection={<IconSettings size={16} />}
           label='Параметры установок'
           renderRoot={props => <Link to='/machinery-parameters' {...props} />}
+        />
+        <NavLink
+          leftSection={<IconReportSearch size={16} />}
+          label='Исследования'
+          renderRoot={props => <Link to='/research' {...props} />}
         />
         {user?.data.isAdmin && (
           <NavLink
