@@ -54,6 +54,7 @@ export type Research = ApiResponseBase<{
   lastExperimentDate: string | null;
   isPublic: boolean;
   machinery: Machinery['data'];
+  parameters: MachineryParameters['data'];
   author: User['data'];
   participants?: Array<User['data']>;
   experimentsCount: number;

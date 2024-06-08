@@ -101,3 +101,43 @@ export const researchSchema = z
   .discriminatedUnion('isPublic', [publicResearchSchema, privateResearchSchema])
   .and(researchBaseSchema);
 export type ResearchData = z.infer<typeof researchSchema>;
+
+const parameterValuesBaseSchema = z.object({
+  parameterId: z.number(),
+});
+const quantitativeValuesSchema = parameterValuesBaseSchema
+  .merge(
+    z.object({
+      value: z.number({
+        required_error: 'Данное поле является обязательным',
+        invalid_type_error: 'Некорректное значение',
+      }),
+    })
+  )
+  .array();
+const qualityValuesSchema = parameterValuesBaseSchema
+  .merge(
+    z.object({
+      value: z
+        .string()
+        .min(1, 'Данное поле является обязательным')
+        .max(255, 'Длина данного поля не должна превышать 255 символов'),
+    })
+  )
+  .array();
+
+export const experimentSchema = z.object({
+  name: z
+    .string()
+    .min(1, 'Данное поле является обязательным')
+    .max(255, 'Длина данного поля не должна превышать 255 символов'),
+  date: z.date({
+    required_error: 'Данное поле является обязательным',
+    invalid_type_error: 'Некорректная дата',
+  }),
+  quantitativeInputs: quantitativeValuesSchema,
+  qualityInputs: qualityValuesSchema,
+  quantitativeOutputs: quantitativeValuesSchema,
+  qualityOutputs: qualityValuesSchema,
+});
+export type ExperimentData = z.infer<typeof experimentSchema>;

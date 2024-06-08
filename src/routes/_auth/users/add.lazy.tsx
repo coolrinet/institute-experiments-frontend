@@ -81,7 +81,7 @@ function AddNewUserPage() {
   return (
     <Stack align='center'>
       <Title ta='center'>Добавить нового пользователя</Title>
-      <Card withBorder padding='xl' radius='md' shadow='xl'>
+      <Card withBorder w='100%' maw={550} mx='auto' padding='xl' radius='md' shadow='xl'>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Stack gap={15}>
             <TextInput

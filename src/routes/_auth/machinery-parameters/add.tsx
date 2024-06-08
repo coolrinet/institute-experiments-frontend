@@ -86,10 +86,10 @@ function AddMachineryParameterPage() {
   });
 
   return (
-    <Stack align='center'>
+    <Stack align='center' w='100%'>
       <Title ta='center'>Добавить новый параметр</Title>
 
-      <Card withBorder maw={550} padding='xl' radius='md' shadow='xl'>
+      <Card withBorder w='100%' maw={550} mx='auto' padding='xl' radius='md' shadow='xl'>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Stack gap={20}>
             <TextInput

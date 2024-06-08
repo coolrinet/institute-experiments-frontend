@@ -4,6 +4,7 @@ import '@mantine/dates/styles.css';
 import '@mantine/notifications/styles.css';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider } from '@tanstack/react-router';
+import 'dayjs/locale/ru';
 import { Suspense } from 'react';
 
 import { queryClient } from '~/lib/react-query';

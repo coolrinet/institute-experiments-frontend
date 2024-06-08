@@ -6,6 +6,7 @@ import {
   Center,
   Checkbox,
   Group,
+  PasswordInput,
   Stack,
   TextInput,
   Title,
@@ -111,12 +112,11 @@ function LoginPage() {
                 disabled={isPending}
                 error={formState.errors.email?.message}
               />
-              <TextInput
+              <PasswordInput
                 {...register('password')}
                 label='Пароль'
                 leftSection={<IconLock size={16} />}
                 leftSectionPointerEvents='none'
-                type='password'
                 placeholder='Введите ваш пароль'
                 disabled={isPending}
                 error={formState.errors.password?.message}

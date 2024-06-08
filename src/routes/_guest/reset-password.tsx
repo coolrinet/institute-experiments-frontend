@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Card, Center, Stack, TextInput, Title } from '@mantine/core';
+import { Button, Card, Center, PasswordInput, Stack, Title } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconCheck, IconLock, IconX } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
@@ -101,22 +101,20 @@ function ResetPasswordPage() {
         <Card withBorder w={450} padding='xl' radius='md' shadow='xl'>
           <form onSubmit={handleSubmit(handleResetPassword)}>
             <Stack gap={15}>
-              <TextInput
+              <PasswordInput
                 {...register('password')}
                 label='Пароль'
                 leftSection={<IconLock size={16} />}
                 leftSectionPointerEvents='none'
-                type='password'
                 placeholder='Введите новый пароль'
                 disabled={isPending}
                 error={formState.errors.password?.message}
               />
-              <TextInput
+              <PasswordInput
                 {...register('passwordConfirmation')}
                 label='Подтверждение пароля'
                 leftSection={<IconLock size={16} />}
                 leftSectionPointerEvents='none'
-                type='password'
                 placeholder='Подтвердите пароль'
                 disabled={isPending}
                 error={formState.errors.passwordConfirmation?.message}

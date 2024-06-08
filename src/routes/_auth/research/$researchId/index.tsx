@@ -13,7 +13,7 @@ import {
   Title,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconCheck, IconEye, IconTrash, IconX } from '@tabler/icons-react';
+import { IconArrowLeft, IconCheck, IconEye, IconTrash, IconX } from '@tabler/icons-react';
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { Link, createFileRoute, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
@@ -159,7 +159,19 @@ function ShowResearchPage() {
 
   return (
     <Stack>
-      <Title>Исследование №{researchId}</Title>
+      <Group align='center'>
+        <ActionIcon variant='subtle'>
+          <IconArrowLeft
+            onClick={() =>
+              navigate({
+                to: '/research',
+                search: { page: 1 },
+              })
+            }
+          />
+        </ActionIcon>
+        <Title>Исследование №{researchId}</Title>
+      </Group>
       <Box pos='relative' w='100%'>
         <LoadingOverlay visible={isFetching || isFetchingExperiments} />
         <Card withBorder w='100%' mx='auto' padding='xl' radius='md' shadow='xl'>
@@ -236,7 +248,15 @@ function ShowResearchPage() {
                   onChange={onExperimentsPageChange}
                 />
               )}
-              <Button renderRoot={props => <Link to='/machinery-parameters/add' {...props} />}>
+              <Button
+                renderRoot={props => (
+                  <Link
+                    {...props}
+                    to='/research/$researchId/experiments/add'
+                    params={{ researchId }}
+                  />
+                )}
+              >
                 Добавить эксперимент
               </Button>
             </Group>

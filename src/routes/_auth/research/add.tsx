@@ -122,9 +122,9 @@ function AddResearchPage() {
     <Stack align='center'>
       <Title>Добавить исследование</Title>
 
-      <Box pos='relative'>
+      <Box pos='relative' w='100%'>
         <LoadingOverlay visible={isMachineriesFetching || isUsersFetching} />
-        <Card withBorder maw={550} padding='xl' radius='md' shadow='xl'>
+        <Card withBorder w='100%' maw={550} mx='auto' padding='xl' radius='md' shadow='xl'>
           <form onSubmit={handleSubmit(onSubmit)}>
             <Stack gap={20}>
               <TextInput
