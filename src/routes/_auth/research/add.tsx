@@ -15,7 +15,7 @@ import {
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconCheck, IconX } from '@tabler/icons-react';
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
 import { Controller, useForm } from 'react-hook-form';
@@ -46,6 +46,8 @@ function AddResearchPage() {
 
   const { user } = useAuth();
 
+  const queryClient = useQueryClient();
+
   const { data: machineries, isFetching: isMachineriesFetching } = useSuspenseQuery(
     getMachineriesQueryOptions({})
   );
@@ -62,6 +64,8 @@ function AddResearchPage() {
   const { mutateAsync: addResearchMutation, isPending } = useMutation({
     mutationFn: addResearch,
     onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['research-list'] });
+
       await router.invalidate();
 
       await navigate({ to: '/research', search: { page: 1 } });

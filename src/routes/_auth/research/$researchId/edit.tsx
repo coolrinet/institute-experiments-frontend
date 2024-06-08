@@ -69,6 +69,8 @@ function EditResearchPage() {
   const { mutateAsync: editResearchMutation, isPending } = useMutation({
     mutationFn: (data: ResearchData) => editResearch(researchId, data),
     onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['research-list'] });
+
       await queryClient.invalidateQueries({
         queryKey: ['research', researchId],
       });

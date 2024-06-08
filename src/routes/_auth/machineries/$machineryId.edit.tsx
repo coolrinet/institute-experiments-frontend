@@ -44,6 +44,8 @@ function EditMachineryPage() {
   const { mutateAsync: editMachineryMutation, isPending } = useMutation({
     mutationFn: (data: MachineryData) => editMachinery(machineryId, data),
     onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['machineries'] });
+
       await queryClient.invalidateQueries({
         queryKey: ['machinery', machineryId],
       });

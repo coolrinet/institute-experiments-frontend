@@ -18,7 +18,6 @@ import { getUserFullName } from '~/utils/get-user-full-name';
 import PageLoader from '~/components/Loader';
 
 export const Route = createFileRoute('/_auth/research/$researchId/experiments/$experimentId/')({
-  parseParams: ({ experimentId }) => ({ experimentId: Number(experimentId) }),
   loader: ({ context, params }) => {
     context.queryClient.ensureQueryData(
       getExperimentQueryOptions(params.researchId, params.experimentId)

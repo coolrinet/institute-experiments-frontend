@@ -60,6 +60,8 @@ function EditMachineryParameterPage() {
     mutationFn: (data: MachineryParameterData) =>
       editMachineryParameter(machineryParameterId, data),
     onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['machinery-parameters'] });
+
       await queryClient.invalidateQueries({
         queryKey: ['machinery-parameter', machineryParameterId],
       });

@@ -10,9 +10,9 @@ import {
   IconUsers,
   IconX,
 } from '@tabler/icons-react';
+import { useMutation } from '@tanstack/react-query';
 import { Link, Outlet, createFileRoute, redirect, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
-import React, { useState } from 'react';
 
 import { useAuth } from '~/hooks/use-auth';
 
@@ -43,16 +43,9 @@ function AuthLayout() {
 
   const { logout, user } = useAuth();
 
-  const [isPending, setIsPending] = useState(false);
-
-  async function handleLogout(event: React.MouseEvent<HTMLButtonElement>) {
-    event.preventDefault();
-
-    setIsPending(true);
-
-    try {
-      await logout();
-
+  const { mutateAsync: logoutMutation, isPending } = useMutation({
+    mutationFn: logout,
+    onSuccess: async () => {
       await router.invalidate();
 
       await navigate({ to: '/login' });
@@ -63,7 +56,8 @@ function AuthLayout() {
         color: 'teal',
         icon: <IconCheck size={16} />,
       });
-    } catch (error) {
+    },
+    onError: error => {
       if (axios.isAxiosError<ApiErrorResponse>(error)) {
         if (error.response && error.status !== 500) {
           notifications.show({
@@ -90,9 +84,11 @@ function AuthLayout() {
           icon: <IconX size={16} />,
         });
       }
-    } finally {
-      setIsPending(false);
-    }
+    },
+  });
+
+  async function handleLogout() {
+    await logoutMutation();
   }
 
   return (
@@ -107,11 +103,23 @@ function AuthLayout() {
         collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
       }}
     >
-      <AppShell.Header>
+      <AppShell.Header bg='blue'>
         <Group h='100%' justify='space-between' px='md'>
-          <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom='sm' size='sm' />
-          <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom='sm' size='sm' />
-          <Button onClick={handleLogout} disabled={isPending} loading={isPending}>
+          <Burger
+            color='white'
+            opened={mobileOpened}
+            onClick={toggleMobile}
+            hiddenFrom='sm'
+            size='sm'
+          />
+          <Burger
+            color='white'
+            opened={desktopOpened}
+            onClick={toggleDesktop}
+            visibleFrom='sm'
+            size='sm'
+          />
+          <Button variant='white' onClick={handleLogout} disabled={isPending} loading={isPending}>
             Выйти из системы
           </Button>
         </Group>

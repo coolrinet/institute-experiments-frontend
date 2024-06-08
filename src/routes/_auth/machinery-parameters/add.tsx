@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Card, Group, Select, Stack, TextInput, Title } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconCheck, IconX } from '@tabler/icons-react';
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
 import { Controller, useForm } from 'react-hook-form';
@@ -25,11 +25,15 @@ function AddMachineryParameterPage() {
   const router = useRouter();
   const navigate = Route.useNavigate();
 
+  const queryClient = useQueryClient();
+
   const { data: machineries } = useSuspenseQuery(getMachineriesQueryOptions({}));
 
   const { isPending, mutateAsync: addMachineryParameterMutation } = useMutation({
     mutationFn: addMachineryParameter,
     onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['machinery-parameters'] });
+
       await router.invalidate();
 
       await navigate({ to: '/machinery-parameters', search: { page: 1 } });

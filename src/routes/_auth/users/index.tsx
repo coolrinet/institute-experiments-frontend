@@ -2,6 +2,7 @@ import {
   ActionIcon,
   Box,
   Button,
+  Card,
   Group,
   LoadingOverlay,
   Pagination,
@@ -132,25 +133,27 @@ function UsersPage() {
       <Title>Список пользователей</Title>
       <Box pos='relative'>
         <LoadingOverlay visible={isFetching} />
-        {users.data.length ? (
-          <Table.ScrollContainer minWidth={500}>
-            <Table>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>Фамилия</Table.Th>
-                  <Table.Th>Имя</Table.Th>
-                  <Table.Th>Отчество</Table.Th>
-                  <Table.Th>Email</Table.Th>
-                  <Table.Th>Администратор?</Table.Th>
-                  <Table.Th />
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>{tableRows}</Table.Tbody>
-            </Table>
-          </Table.ScrollContainer>
-        ) : (
-          <Text>Пользователи отсутствуют</Text>
-        )}
+        <Card withBorder shadow='xl' padding='lg' radius='md'>
+          {users.data.length ? (
+            <Table.ScrollContainer minWidth={500}>
+              <Table>
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th>Фамилия</Table.Th>
+                    <Table.Th>Имя</Table.Th>
+                    <Table.Th>Отчество</Table.Th>
+                    <Table.Th>Email</Table.Th>
+                    <Table.Th>Администратор?</Table.Th>
+                    <Table.Th />
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>{tableRows}</Table.Tbody>
+              </Table>
+            </Table.ScrollContainer>
+          ) : (
+            <Text>Пользователи отсутствуют</Text>
+          )}
+        </Card>
       </Box>
 
       <Group justify='space-between'>

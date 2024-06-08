@@ -29,7 +29,9 @@ import { Route as AuthResearchResearchIdEditImport } from './routes/_auth/resear
 import { Route as AuthMachineryParametersMachineryParameterIdEditImport } from './routes/_auth/machinery-parameters/$machineryParameterId.edit'
 import { Route as AuthMachineriesMachineryIdEditImport } from './routes/_auth/machineries/$machineryId.edit'
 import { Route as AuthResearchResearchIdExperimentsAddImport } from './routes/_auth/research/$researchId/experiments/add'
+import { Route as AuthResearchResearchIdExperimentsExperimentIdImport } from './routes/_auth/research/$researchId/experiments/$experimentId'
 import { Route as AuthResearchResearchIdExperimentsExperimentIdIndexImport } from './routes/_auth/research/$researchId/experiments/$experimentId/index'
+import { Route as AuthResearchResearchIdExperimentsExperimentIdEditImport } from './routes/_auth/research/$researchId/experiments/$experimentId/edit'
 
 // Create Virtual Routes
 
@@ -163,10 +165,22 @@ const AuthResearchResearchIdExperimentsAddRoute =
     getParentRoute: () => AuthResearchResearchIdRoute,
   } as any)
 
+const AuthResearchResearchIdExperimentsExperimentIdRoute =
+  AuthResearchResearchIdExperimentsExperimentIdImport.update({
+    path: '/experiments/$experimentId',
+    getParentRoute: () => AuthResearchResearchIdRoute,
+  } as any)
+
 const AuthResearchResearchIdExperimentsExperimentIdIndexRoute =
   AuthResearchResearchIdExperimentsExperimentIdIndexImport.update({
-    path: '/experiments/$experimentId/',
-    getParentRoute: () => AuthResearchResearchIdRoute,
+    path: '/',
+    getParentRoute: () => AuthResearchResearchIdExperimentsExperimentIdRoute,
+  } as any)
+
+const AuthResearchResearchIdExperimentsExperimentIdEditRoute =
+  AuthResearchResearchIdExperimentsExperimentIdEditImport.update({
+    path: '/edit',
+    getParentRoute: () => AuthResearchResearchIdExperimentsExperimentIdRoute,
   } as any)
 
 // Populate the FileRoutesByPath interface
@@ -313,6 +327,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthResearchResearchIdIndexImport
       parentRoute: typeof AuthResearchResearchIdImport
     }
+    '/_auth/research/$researchId/experiments/$experimentId': {
+      id: '/_auth/research/$researchId/experiments/$experimentId'
+      path: '/experiments/$experimentId'
+      fullPath: '/research/$researchId/experiments/$experimentId'
+      preLoaderRoute: typeof AuthResearchResearchIdExperimentsExperimentIdImport
+      parentRoute: typeof AuthResearchResearchIdImport
+    }
     '/_auth/research/$researchId/experiments/add': {
       id: '/_auth/research/$researchId/experiments/add'
       path: '/experiments/add'
@@ -320,12 +341,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthResearchResearchIdExperimentsAddImport
       parentRoute: typeof AuthResearchResearchIdImport
     }
+    '/_auth/research/$researchId/experiments/$experimentId/edit': {
+      id: '/_auth/research/$researchId/experiments/$experimentId/edit'
+      path: '/edit'
+      fullPath: '/research/$researchId/experiments/$experimentId/edit'
+      preLoaderRoute: typeof AuthResearchResearchIdExperimentsExperimentIdEditImport
+      parentRoute: typeof AuthResearchResearchIdExperimentsExperimentIdImport
+    }
     '/_auth/research/$researchId/experiments/$experimentId/': {
       id: '/_auth/research/$researchId/experiments/$experimentId/'
-      path: '/experiments/$experimentId'
-      fullPath: '/research/$researchId/experiments/$experimentId'
+      path: '/'
+      fullPath: '/research/$researchId/experiments/$experimentId/'
       preLoaderRoute: typeof AuthResearchResearchIdExperimentsExperimentIdIndexImport
-      parentRoute: typeof AuthResearchResearchIdImport
+      parentRoute: typeof AuthResearchResearchIdExperimentsExperimentIdImport
     }
   }
 }
@@ -343,8 +371,12 @@ export const routeTree = rootRoute.addChildren({
     AuthResearchResearchIdRoute: AuthResearchResearchIdRoute.addChildren({
       AuthResearchResearchIdEditRoute,
       AuthResearchResearchIdIndexRoute,
+      AuthResearchResearchIdExperimentsExperimentIdRoute:
+        AuthResearchResearchIdExperimentsExperimentIdRoute.addChildren({
+          AuthResearchResearchIdExperimentsExperimentIdEditRoute,
+          AuthResearchResearchIdExperimentsExperimentIdIndexRoute,
+        }),
       AuthResearchResearchIdExperimentsAddRoute,
-      AuthResearchResearchIdExperimentsExperimentIdIndexRoute,
     }),
     AuthResearchAddRoute,
     AuthMachineriesAddLazyRoute,
@@ -431,8 +463,8 @@ export const routeTree = rootRoute.addChildren({
       "children": [
         "/_auth/research/$researchId/edit",
         "/_auth/research/$researchId/",
-        "/_auth/research/$researchId/experiments/add",
-        "/_auth/research/$researchId/experiments/$experimentId/"
+        "/_auth/research/$researchId/experiments/$experimentId",
+        "/_auth/research/$researchId/experiments/add"
       ]
     },
     "/_auth/research/add": {
@@ -479,13 +511,25 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "_auth/research/$researchId/index.tsx",
       "parent": "/_auth/research/$researchId"
     },
+    "/_auth/research/$researchId/experiments/$experimentId": {
+      "filePath": "_auth/research/$researchId/experiments/$experimentId.tsx",
+      "parent": "/_auth/research/$researchId",
+      "children": [
+        "/_auth/research/$researchId/experiments/$experimentId/edit",
+        "/_auth/research/$researchId/experiments/$experimentId/"
+      ]
+    },
     "/_auth/research/$researchId/experiments/add": {
       "filePath": "_auth/research/$researchId/experiments/add.tsx",
       "parent": "/_auth/research/$researchId"
     },
+    "/_auth/research/$researchId/experiments/$experimentId/edit": {
+      "filePath": "_auth/research/$researchId/experiments/$experimentId/edit.tsx",
+      "parent": "/_auth/research/$researchId/experiments/$experimentId"
+    },
     "/_auth/research/$researchId/experiments/$experimentId/": {
       "filePath": "_auth/research/$researchId/experiments/$experimentId/index.tsx",
-      "parent": "/_auth/research/$researchId"
+      "parent": "/_auth/research/$researchId/experiments/$experimentId"
     }
   }
 }

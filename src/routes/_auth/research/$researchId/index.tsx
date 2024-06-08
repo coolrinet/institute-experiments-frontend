@@ -13,7 +13,7 @@ import {
   Title,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconArrowLeft, IconCheck, IconEye, IconTrash, IconX } from '@tabler/icons-react';
+import { IconArrowLeft, IconCheck, IconEdit, IconEye, IconTrash, IconX } from '@tabler/icons-react';
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { Link, createFileRoute, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
@@ -62,6 +62,13 @@ function ShowResearchPage() {
   const handleShow = async (experimentId: number) => {
     await navigate({
       to: '/research/$researchId/experiments/$experimentId',
+      params: { experimentId, researchId },
+    });
+  };
+
+  const handleEdit = async (experimentId: number) => {
+    await navigate({
+      to: '/research/$researchId/experiments/$experimentId/edit',
       params: { experimentId, researchId },
     });
   };
@@ -142,9 +149,9 @@ function ShowResearchPage() {
           <ActionIcon color='teal' onClick={() => handleShow(experiment.id)}>
             <IconEye size={16} />
           </ActionIcon>
-          {/* <ActionIcon onClick={() => handleEdit(item.id)}>
+          <ActionIcon onClick={() => handleEdit(experiment.id)}>
             <IconEdit size={16} />
-          </ActionIcon> */}
+          </ActionIcon>
           <ActionIcon color='red' onClick={() => handleDelete(experiment.id)}>
             <IconTrash size={16} />
           </ActionIcon>

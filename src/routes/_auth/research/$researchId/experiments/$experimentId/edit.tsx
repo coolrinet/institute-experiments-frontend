@@ -17,43 +17,48 @@ import { IconCheck, IconX } from '@tabler/icons-react';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
+import dayjs from 'dayjs';
 import { useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
-import { addExperiment } from '~/api/experiments/add-experiment';
-import { getResearchQueryOptions } from '~/api/research/get-research';
+import { editExperiment } from '~/api/experiments/edit-experiment';
+import { getExperimentQueryOptions } from '~/api/experiments/get-experiment';
 
 import PageLoader from '~/components/Loader';
 
-import { ApiErrorResponse, MachineryParameter } from '~/types/api';
+import { ApiErrorResponse } from '~/types/api';
 import { ExperimentData, experimentSchema } from '~/types/schema';
 
-export const Route = createFileRoute('/_auth/research/$researchId/experiments/add')({
-  component: AddExperimentPage,
+export const Route = createFileRoute('/_auth/research/$researchId/experiments/$experimentId/edit')({
+  component: EditExperimentPage,
   loader: ({ context, params }) => {
-    context.queryClient.ensureQueryData(getResearchQueryOptions(params.researchId));
+    context.queryClient.ensureQueryData(
+      getExperimentQueryOptions(params.researchId, params.experimentId)
+    );
   },
   pendingComponent: PageLoader,
 });
 
-function AddExperimentPage() {
-  const { researchId } = Route.useParams();
+function EditExperimentPage() {
+  const { researchId, experimentId } = Route.useParams();
   const navigate = Route.useNavigate();
   const router = useRouter();
 
   const queryClient = useQueryClient();
 
-  const { data: research, isFetching: isResearchFetching } = useSuspenseQuery(
-    getResearchQueryOptions(researchId)
+  const { data: experiment, isFetching: isExperimentFetching } = useSuspenseQuery(
+    getExperimentQueryOptions(researchId, experimentId)
   );
 
-  const { mutateAsync: addExperimentMutation, isPending } = useMutation({
-    mutationFn: (data: ExperimentData) => addExperiment(researchId, data),
+  const { mutateAsync: editExperimentMutation, isPending } = useMutation({
+    mutationFn: (data: ExperimentData) => editExperiment(researchId, experimentId, data),
     onSuccess: async () => {
+      await router.invalidate();
+
       await queryClient.invalidateQueries({ queryKey: ['experiments', researchId] });
 
-      await queryClient.invalidateQueries({ queryKey: ['research', researchId] });
+      await queryClient.invalidateQueries({ queryKey: ['experiment', experimentId, researchId] });
 
-      await router.invalidate();
+      await queryClient.invalidateQueries({ queryKey: ['research', researchId] });
 
       await navigate({
         to: '/research/$researchId',
@@ -63,7 +68,7 @@ function AddExperimentPage() {
 
       notifications.show({
         title: 'Успех',
-        message: 'Эксперимент успешно добавлен в систему',
+        message: 'Эксперимент успешно изменён',
         color: 'teal',
         icon: <IconCheck size={16} />,
       });
@@ -99,53 +104,30 @@ function AddExperimentPage() {
   });
 
   const onSubmit = async (data: ExperimentData) => {
-    await addExperimentMutation(data);
+    await editExperimentMutation(data);
   };
 
-  const filterByParameterType = (
-    param: MachineryParameter['data'],
-    parameterType: MachineryParameter['data']['parameterType']
-  ) => param.parameterType === parameterType;
-
-  const filterByValueType = (
-    param: MachineryParameter['data'],
-    valueType: MachineryParameter['data']['valueType']
-  ) => param.valueType === valueType;
-
-  const quantitativeInputs = research.data.parameters.filter(
-    param => filterByParameterType(param, 'input') && filterByValueType(param, 'quantitative')
-  );
-  const qualityInputs = research.data.parameters.filter(
-    param => filterByParameterType(param, 'input') && filterByValueType(param, 'quality')
-  );
-  const quantitativeOutputs = research.data.parameters.filter(
-    param => filterByParameterType(param, 'output') && filterByValueType(param, 'quantitative')
-  );
-  const qualityOutputs = research.data.parameters.filter(
-    param => filterByParameterType(param, 'output') && filterByValueType(param, 'quality')
-  );
-
-  const [active, setActive] = useState(0);
+  console.log(experiment);
 
   const { handleSubmit, register, control, formState, trigger } = useForm<ExperimentData>({
     defaultValues: {
-      name: '',
-      date: new Date(),
-      quantitativeInputs: quantitativeInputs.map(param => ({
-        parameterId: param.id,
-        value: NaN,
+      name: experiment.data.name,
+      date: dayjs(experiment.data.date, 'D MMMM YYYY', 'ru').toDate(),
+      quantitativeInputs: experiment.data.quantitativeInputs.map(param => ({
+        parameterId: param.parameterId,
+        value: param.value,
       })),
-      qualityInputs: qualityInputs.map(param => ({
-        parameterId: param.id,
-        value: '',
+      qualityInputs: experiment.data.qualityInputs.map(param => ({
+        parameterId: param.parameterId,
+        value: param.value,
       })),
-      quantitativeOutputs: quantitativeOutputs.map(param => ({
-        parameterId: param.id,
-        value: NaN,
+      quantitativeOutputs: experiment.data.quantitativeOutputs.map(param => ({
+        parameterId: param.parameterId,
+        value: param.value,
       })),
-      qualityOutputs: qualityOutputs.map(param => ({
-        parameterId: param.id,
-        value: '',
+      qualityOutputs: experiment.data.qualityOutputs.map(param => ({
+        parameterId: param.parameterId,
+        value: param.value,
       })),
     },
     mode: 'onChange',
@@ -178,26 +160,33 @@ function AddExperimentPage() {
     ['quantitativeOutputs', 'qualityOutputs'],
   ] as const;
 
-  const nextStep = async () => {
-    const isValid = await trigger(formFields[active]);
+  const [active, setActive] = useState(0);
 
+  const handleStepChange = async (nextStep: number) => {
+    const isFieldsValid = await trigger(formFields[active]);
     setActive(current => {
-      if (!isValid) return current;
-      return current < 2 ? current + 1 : current;
+      if (!isFieldsValid) return current;
+      return nextStep;
     });
   };
 
-  const prevStep = () => setActive(current => (current > 0 ? current - 1 : current));
+  const shouldAllowSelectStep = (step: number) => {
+    return step >= 0 && step <= 2 && active !== step;
+  };
 
   return (
     <Stack align='center'>
-      <Title ta='center'>Добавить эксперимент</Title>
+      <Title ta='center'>Изменить эксперимент</Title>
       <Box pos='relative' w='100%'>
-        <LoadingOverlay visible={isResearchFetching} />
+        <LoadingOverlay visible={isExperimentFetching} />
         <Stack>
           <Card withBorder w='100%' mx='auto' padding='xl' radius='md' shadow='xl'>
-            <Stepper active={active}>
-              <Stepper.Step lang='ru' label='Основные данные'>
+            <Stepper active={active} onStepClick={handleStepChange}>
+              <Stepper.Step
+                lang='ru'
+                label='Основные данные'
+                allowStepSelect={shouldAllowSelectStep(0)}
+              >
                 <Stack>
                   <TextInput
                     {...register('name')}
@@ -226,7 +215,11 @@ function AddExperimentPage() {
                 </Stack>
               </Stepper.Step>
 
-              <Stepper.Step lang='ru' label='Входные данные'>
+              <Stepper.Step
+                lang='ru'
+                label='Входные данные'
+                allowStepSelect={shouldAllowSelectStep(1)}
+              >
                 <Stack>
                   {quantitativeInputsFields.map((item, index) => (
                     <Controller
@@ -237,7 +230,7 @@ function AddExperimentPage() {
                         <NumberInput
                           {...field}
                           withAsterisk
-                          label={quantitativeInputs[index].name}
+                          label={experiment.data.quantitativeInputs[index].name}
                           description='Количественный параметр'
                           placeholder='Введите значение параметра'
                           hideControls
@@ -256,7 +249,7 @@ function AddExperimentPage() {
                         <TextInput
                           {...field}
                           withAsterisk
-                          label={qualityInputs[index].name}
+                          label={experiment.data.qualityInputs[index].name}
                           description='Качественный параметр'
                           placeholder='Введите значение параметра'
                           error={formState.errors.qualityInputs?.[index]?.value?.message}
@@ -267,7 +260,11 @@ function AddExperimentPage() {
                 </Stack>
               </Stepper.Step>
 
-              <Stepper.Step lang='ru' label='Выходные данные'>
+              <Stepper.Step
+                lang='ru'
+                label='Выходные данные'
+                allowStepSelect={shouldAllowSelectStep(2)}
+              >
                 <Stack>
                   {quantitativeOutputsFields.map((item, index) => (
                     <Controller
@@ -278,7 +275,7 @@ function AddExperimentPage() {
                         <NumberInput
                           {...field}
                           withAsterisk
-                          label={quantitativeOutputs[index].name}
+                          label={experiment.data.quantitativeOutputs[index].name}
                           description='Количественный параметр'
                           placeholder='Введите значение параметра'
                           hideControls
@@ -297,7 +294,7 @@ function AddExperimentPage() {
                         <TextInput
                           {...field}
                           withAsterisk
-                          label={qualityOutputs[index].name}
+                          label={experiment.data.qualityOutputs[index].name}
                           description='Качественный параметр'
                           placeholder='Введите значение параметра'
                           error={formState.errors.qualityOutputs?.[index]?.value?.message}
@@ -309,22 +306,12 @@ function AddExperimentPage() {
               </Stepper.Step>
             </Stepper>
             <Group justify='flex-end' mt='xl'>
-              {active !== 0 ? (
-                <Button variant='default' onClick={prevStep}>
-                  Назад
-                </Button>
-              ) : (
-                <Button variant='outline' color='red' onClick={() => router.history.back()}>
-                  Отменить создание
-                </Button>
-              )}
-              {active !== 2 ? (
-                <Button onClick={nextStep}>След. шаг</Button>
-              ) : (
-                <Button onClick={handleSubmit(onSubmit)} loading={isPending}>
-                  Добавить эксперимент
-                </Button>
-              )}
+              <Button variant='outline' color='red' onClick={() => router.history.back()}>
+                Отменить создание
+              </Button>
+              <Button onClick={handleSubmit(onSubmit)} loading={isPending}>
+                Добавить эксперимент
+              </Button>
             </Group>
           </Card>
         </Stack>
