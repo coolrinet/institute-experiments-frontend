@@ -101,15 +101,17 @@ function ExperimentPage() {
               <Text fw='bold' ta='center' fs='italic'>
                 Входные параметры:
               </Text>
-              <Table withColumnBorders withTableBorder>
-                <Table.Thead>
-                  <Table.Tr>
-                    <Table.Th>Название</Table.Th>
-                    <Table.Th>Значение</Table.Th>
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>{experimentInputsTableRows}</Table.Tbody>
-              </Table>
+              <Table.ScrollContainer minWidth={350}>
+                <Table withColumnBorders withTableBorder>
+                  <Table.Thead>
+                    <Table.Tr>
+                      <Table.Th>Название</Table.Th>
+                      <Table.Th>Значение</Table.Th>
+                    </Table.Tr>
+                  </Table.Thead>
+                  <Table.Tbody>{experimentInputsTableRows}</Table.Tbody>
+                </Table>
+              </Table.ScrollContainer>
             </Stack>
           </Card.Section>
           <Card.Section withBorder inheritPadding py='md'>
@@ -117,15 +119,17 @@ function ExperimentPage() {
               <Text fw='bold' ta='center' fs='italic'>
                 Выходные параметры:
               </Text>
-              <Table withColumnBorders withTableBorder>
-                <Table.Thead>
-                  <Table.Tr>
-                    <Table.Th>Название</Table.Th>
-                    <Table.Th>Значение</Table.Th>
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>{experimentOutputsTableRows}</Table.Tbody>
-              </Table>
+              <Table.ScrollContainer minWidth={350}>
+                <Table withColumnBorders withTableBorder>
+                  <Table.Thead>
+                    <Table.Tr>
+                      <Table.Th>Название</Table.Th>
+                      <Table.Th>Значение</Table.Th>
+                    </Table.Tr>
+                  </Table.Thead>
+                  <Table.Tbody>{experimentOutputsTableRows}</Table.Tbody>
+                </Table>
+              </Table.ScrollContainer>
             </Stack>
           </Card.Section>
         </Card>

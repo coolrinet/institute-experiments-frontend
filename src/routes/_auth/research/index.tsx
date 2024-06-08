@@ -232,7 +232,7 @@ function ResearchPage() {
           </Card.Section>
           {research.data.length ? (
             <Table.ScrollContainer minWidth={500} mt='sm'>
-              <Table highlightOnHover>
+              <Table>
                 <Table.Thead>
                   <Table.Tr>
                     <Table.Th>Название</Table.Th>

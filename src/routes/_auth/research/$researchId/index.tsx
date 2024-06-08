@@ -135,17 +135,19 @@ function ShowResearchPage() {
           <Stack mt='sm'>
             <Title order={2}>Эксперименты исследования</Title>
             {experiments.data.length > 0 ? (
-              <Table>
-                <Table.Thead>
-                  <Table.Tr>
-                    <Table.Th>Название</Table.Th>
-                    <Table.Th>Дата проведения</Table.Th>
-                    <Table.Th>Кем добавлен</Table.Th>
-                    <Table.Th />
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>{experimentTableRows}</Table.Tbody>
-              </Table>
+              <Table.ScrollContainer minWidth={500}>
+                <Table>
+                  <Table.Thead>
+                    <Table.Tr>
+                      <Table.Th>Название</Table.Th>
+                      <Table.Th>Дата проведения</Table.Th>
+                      <Table.Th>Кем добавлен</Table.Th>
+                      <Table.Th />
+                    </Table.Tr>
+                  </Table.Thead>
+                  <Table.Tbody>{experimentTableRows}</Table.Tbody>
+                </Table>
+              </Table.ScrollContainer>
             ) : (
               <Text>Эксперименты отсутствуют</Text>
             )}
