@@ -15,7 +15,7 @@ import {
 } from '@mantine/core';
 import { useDebouncedCallback } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { IconCheck, IconSearch, IconTrash, IconX } from '@tabler/icons-react';
+import { IconCheck, IconEdit, IconSearch, IconTrash, IconX } from '@tabler/icons-react';
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { Link, createFileRoute, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
@@ -147,6 +147,22 @@ function ResearchPage() {
     }
   };
 
+  const handleEdit = (researchId: number) => {
+    const researchItem = research.data.find(item => item.id === researchId);
+
+    if (user?.data.id !== researchItem!.author.id) {
+      notifications.show({
+        title: 'Неудача',
+        message: 'Нельзя редактировать исследование, созданное другим пользователем',
+        color: 'red',
+        icon: <IconX size={16} />,
+      });
+      return;
+    }
+
+    navigate({ to: '/research/$researchId/edit', params: { researchId: researchItem!.id } });
+  };
+
   const tableRows = research.data.map(item => {
     let userFullName = `${item.author.lastName} ${item.author.firstName[0]}.`;
 
@@ -163,17 +179,9 @@ function ResearchPage() {
         <Table.Td>{userFullName}</Table.Td>
         <Table.Td>
           <ActionIcon.Group>
-            {/* <ActionIcon
-              renderRoot={props => (
-                <Link
-                  to='/machinery-parameters/$machineryParameterId/edit'
-                  params={{ machineryParameterId: machineryParameter.id }}
-                  {...props}
-                />
-              )}
-            >
+            <ActionIcon onClick={() => handleEdit(item.id)}>
               <IconEdit size={16} />
-            </ActionIcon> */}
+            </ActionIcon>
             <ActionIcon color='red' onClick={() => handleDelete(item.id)}>
               <IconTrash size={16} />
             </ActionIcon>

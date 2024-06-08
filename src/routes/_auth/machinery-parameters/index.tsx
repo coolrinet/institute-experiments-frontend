@@ -23,6 +23,7 @@ import { z } from 'zod';
 import { deleteMachineryParameter } from '~/api/machinery-parameters/delete-machinery-parameter';
 import { getMachineryParametersQueryOptions } from '~/api/machinery-parameters/get-machinery-parameters';
 import { PARAMETER_TYPE_ITEMS, VALUE_TYPE_ITEMS } from '~/utils/consts';
+import { getUserFullName } from '~/utils/get-user-full-name';
 
 import PageLoader from '~/components/Loader';
 
@@ -145,12 +146,6 @@ function MachineryParametersPage() {
   };
 
   const tableRows = machineryParameters.data.map(machineryParameter => {
-    let userFullName = `${machineryParameter.user.lastName} ${machineryParameter.user.firstName[0]}.`;
-
-    if (machineryParameter.user.middleName) {
-      userFullName += ` ${machineryParameter.user.middleName[0]}.`;
-    }
-
     return (
       <Table.Tr key={machineryParameter.id}>
         <Table.Td>{machineryParameter.name}</Table.Td>
@@ -159,7 +154,7 @@ function MachineryParametersPage() {
           {machineryParameter.valueType === 'quantitative' ? 'количественный' : 'качественный'}
         </Table.Td>
         <Table.Td>{machineryParameter.machinery?.name || '-'}</Table.Td>
-        <Table.Td>{userFullName}</Table.Td>
+        <Table.Td>{getUserFullName(machineryParameter.user)}</Table.Td>
         <Table.Td>
           <ActionIcon.Group>
             <ActionIcon

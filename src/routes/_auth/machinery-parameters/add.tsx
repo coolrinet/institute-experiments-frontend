@@ -32,7 +32,7 @@ function AddMachineryParameterPage() {
     onSuccess: async () => {
       await router.invalidate();
 
-      await navigate({ to: '/machinery-parameters' });
+      await navigate({ to: '/machinery-parameters', search: { page: 1 } });
 
       notifications.show({
         title: 'Успех',

@@ -52,9 +52,10 @@ export type Research = ApiResponseBase<{
   name: string;
   description: string | null;
   lastExperimentDate: string | null;
+  isPublic: boolean;
   machinery: Machinery['data'];
-  parameters?: Array<MachineryParameter['data']>;
   author: User['data'];
   participants?: Array<User['data']>;
+  experimentsCount: number;
 }>;
-export type ResearchList = ApiResponseBase<Array<Research['data']>>;
+export type ResearchList = ApiResponseBase<Array<Omit<Research['data'], 'experimentsCount'>>>;

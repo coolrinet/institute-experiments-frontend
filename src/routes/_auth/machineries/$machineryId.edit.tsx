@@ -50,7 +50,7 @@ function EditMachineryPage() {
 
       await router.invalidate();
 
-      await navigate({ to: '/machineries' });
+      await navigate({ to: '/machineries', search: { page: 1 } });
 
       notifications.show({
         title: 'Успех',

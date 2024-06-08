@@ -24,7 +24,7 @@ function AddNewUserPage() {
     onSuccess: async () => {
       await router.invalidate();
 
-      await navigate({ to: '/users' });
+      await navigate({ to: '/users', search: { page: 1 } });
 
       notifications.show({
         title: 'Успех',

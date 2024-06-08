@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
+  Alert,
   Box,
   Button,
   Card,
@@ -9,18 +10,20 @@ import {
   MultiSelect,
   Select,
   Stack,
+  Text,
   TextInput,
   Textarea,
   Title,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconCheck, IconX } from '@tabler/icons-react';
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
+import { IconAlertCircle, IconCheck, IconX } from '@tabler/icons-react';
+import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
 import { Controller, useForm } from 'react-hook-form';
 import { getMachineriesQueryOptions } from '~/api/machineries/get-machineries';
-import { addResearch } from '~/api/research/add-research';
+import { editResearch } from '~/api/research/edit-research';
+import { getResearchQueryOptions } from '~/api/research/get-research';
 import { getUsersQueryOptions } from '~/api/users/get-users';
 import { getUserFullName } from '~/utils/get-user-full-name';
 
@@ -31,21 +34,29 @@ import { useAuth } from '~/hooks/use-auth';
 import { ApiErrorResponse } from '~/types/api';
 import { ResearchData, researchSchema } from '~/types/schema';
 
-export const Route = createFileRoute('/_auth/research/add')({
-  component: AddResearchPage,
-  loader: ({ context }) => {
+export const Route = createFileRoute('/_auth/research/$researchId/edit')({
+  parseParams: ({ researchId }) => ({ researchId: Number(researchId) }),
+  loader: ({ context, params }) => {
+    context.queryClient.ensureQueryData(getResearchQueryOptions(params.researchId));
     context.queryClient.ensureQueryData(getMachineriesQueryOptions({}));
     context.queryClient.ensureQueryData(getUsersQueryOptions({}));
   },
+  component: EditResearchPage,
   pendingComponent: PageLoader,
 });
 
-function AddResearchPage() {
-  const router = useRouter();
+function EditResearchPage() {
+  const { researchId } = Route.useParams();
   const navigate = Route.useNavigate();
+  const router = useRouter();
 
   const { user } = useAuth();
 
+  const queryClient = useQueryClient();
+
+  const { data: research, isFetching: isResearchFetching } = useSuspenseQuery(
+    getResearchQueryOptions(researchId)
+  );
   const { data: machineries, isFetching: isMachineriesFetching } = useSuspenseQuery(
     getMachineriesQueryOptions({})
   );
@@ -59,16 +70,20 @@ function AddResearchPage() {
         label: getUserFullName(item),
       }));
 
-  const { mutateAsync: addResearchMutation, isPending } = useMutation({
-    mutationFn: addResearch,
+  const { mutateAsync: editResearchMutation, isPending } = useMutation({
+    mutationFn: (data: ResearchData) => editResearch(researchId, data),
     onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ['research', researchId],
+      });
+
       await router.invalidate();
 
       await navigate({ to: '/research', search: { page: 1 } });
 
       notifications.show({
         title: 'Успех',
-        message: 'Исследование успешно добавлено в систему',
+        message: 'Исследование успешно изменено',
         color: 'teal',
         icon: <IconCheck size={16} />,
       });
@@ -104,27 +119,42 @@ function AddResearchPage() {
   });
 
   const onSubmit = async (data: ResearchData) => {
-    await addResearchMutation(data);
+    await editResearchMutation(data);
   };
 
   const { handleSubmit, register, control, watch, formState } = useForm<ResearchData>({
     defaultValues: {
-      name: '',
-      description: '',
-      isPublic: true,
-      machineryId: NaN,
+      name: research.data.name,
+      description: research.data.description,
+      isPublic: research.data.isPublic,
+      machineryId: research.data.machinery.id,
     },
     resolver: zodResolver(researchSchema),
   });
   const isPublicValue = watch('isPublic');
 
   return (
-    <Stack align='center'>
-      <Title>Добавить исследование</Title>
+    <Stack align='center' gap={15}>
+      <Title>Изменить данные исследования</Title>
 
-      <Box pos='relative'>
-        <LoadingOverlay visible={isMachineriesFetching || isUsersFetching} />
-        <Card withBorder maw={550} padding='xl' radius='md' shadow='xl'>
+      {!research.data.experimentsCount && (
+        <Alert
+          icon={<IconAlertCircle size={16} />}
+          title='Внимание'
+          color='orange'
+          radius='md'
+          maw={550}
+        >
+          <Text>
+            Так как исследование уже содержит эксперименты, вы не можете изменить установку, на
+            которой они проводились!
+          </Text>
+        </Alert>
+      )}
+
+      <Box pos='relative' w='100%'>
+        <LoadingOverlay visible={isMachineriesFetching || isUsersFetching || isResearchFetching} />
+        <Card withBorder w='100%' maw={550} mx='auto' padding='xl' radius='md' shadow='xl'>
           <form onSubmit={handleSubmit(onSubmit)}>
             <Stack gap={20}>
               <TextInput
@@ -164,7 +194,7 @@ function AddResearchPage() {
                       value: machinery.id.toString(),
                       label: machinery.name,
                     }))}
-                    disabled={isPending}
+                    disabled={isPending || !research.data.experimentsCount}
                     value={isNaN(value) ? null : value?.toString()}
                     error={formState.errors.machineryId?.message}
                   />
@@ -189,6 +219,7 @@ function AddResearchPage() {
                     data={prepareUsersForSelect()}
                     disabled={isPending || isPublicValue}
                     clearable
+                    defaultValue={research.data.participants!.map(user => user.id.toString())}
                     value={value?.map(id => id.toString())}
                   />
                 )}
@@ -203,7 +234,7 @@ function AddResearchPage() {
                   Отменить
                 </Button>
                 <Button type='submit' disabled={isPending} loading={isPending}>
-                  Добавить
+                  Изменить
                 </Button>
               </Group>
             </Stack>

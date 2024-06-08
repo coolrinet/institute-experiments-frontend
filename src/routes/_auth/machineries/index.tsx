@@ -21,6 +21,7 @@ import axios from 'axios';
 import { z } from 'zod';
 import { deleteMachinery } from '~/api/machineries/delete-machinery';
 import { getMachineriesQueryOptions } from '~/api/machineries/get-machineries';
+import { getUserFullName } from '~/utils/get-user-full-name';
 
 import PageLoader from '~/components/Loader';
 
@@ -134,17 +135,11 @@ function MachineriesPage() {
   };
 
   const tableRows = machineries.data.map(machinery => {
-    let userFullName = `${machinery.user.lastName} ${machinery.user.firstName[0]}.`;
-
-    if (machinery.user.middleName) {
-      userFullName += ` ${machinery.user.middleName[0]}.`;
-    }
-
     return (
       <Table.Tr key={machinery.id}>
         <Table.Td>{machinery.name}</Table.Td>
         <Table.Td>{machinery.description}</Table.Td>
-        <Table.Td>{userFullName}</Table.Td>
+        <Table.Td>{getUserFullName(machinery.user)}</Table.Td>
         <Table.Td>
           <ActionIcon.Group>
             <ActionIcon
