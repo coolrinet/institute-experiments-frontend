@@ -27,22 +27,18 @@ import { getResearchQueryOptions } from '~/api/research/get-research';
 import { getUsersQueryOptions } from '~/api/users/get-users';
 import { getUserFullName } from '~/utils/get-user-full-name';
 
-import PageLoader from '~/components/Loader';
-
 import { useAuth } from '~/hooks/use-auth';
 
 import { ApiErrorResponse } from '~/types/api';
 import { ResearchData, researchSchema } from '~/types/schema';
 
 export const Route = createFileRoute('/_auth/research/$researchId/edit')({
-  parseParams: ({ researchId }) => ({ researchId: Number(researchId) }),
   loader: ({ context, params }) => {
     context.queryClient.ensureQueryData(getResearchQueryOptions(params.researchId));
     context.queryClient.ensureQueryData(getMachineriesQueryOptions({}));
     context.queryClient.ensureQueryData(getUsersQueryOptions({}));
   },
   component: EditResearchPage,
-  pendingComponent: PageLoader,
 });
 
 function EditResearchPage() {

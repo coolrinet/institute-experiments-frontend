@@ -15,7 +15,7 @@ import {
 } from '@mantine/core';
 import { useDebouncedCallback } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { IconCheck, IconEdit, IconSearch, IconTrash, IconX } from '@tabler/icons-react';
+import { IconCheck, IconEdit, IconEye, IconSearch, IconTrash, IconX } from '@tabler/icons-react';
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { Link, createFileRoute, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
@@ -82,6 +82,10 @@ function ResearchPage() {
   const handleSearchByName = useDebouncedCallback(async (name: string) => {
     await onParamChange('name', name);
   }, 200);
+
+  const handleShow = async (researchId: number) => {
+    await navigate({ to: '/research/$researchId', params: { researchId } });
+  };
 
   const handleDelete = async (researchId: number) => {
     const researchItem = research.data.find(item => item.id === researchId);
@@ -179,6 +183,9 @@ function ResearchPage() {
         <Table.Td>{userFullName}</Table.Td>
         <Table.Td>
           <ActionIcon.Group>
+            <ActionIcon color='teal' onClick={() => handleShow(item.id)}>
+              <IconEye size={16} />
+            </ActionIcon>
             <ActionIcon onClick={() => handleEdit(item.id)}>
               <IconEdit size={16} />
             </ActionIcon>

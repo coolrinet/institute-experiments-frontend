@@ -59,3 +59,27 @@ export type Research = ApiResponseBase<{
   experimentsCount: number;
 }>;
 export type ResearchList = ApiResponseBase<Array<Omit<Research['data'], 'experimentsCount'>>>;
+
+export type Experiment = ApiResponseBase<{
+  id: number;
+  name: string;
+  date: string;
+  user: User['data'];
+}>;
+
+type ExperimentParameter<T> = {
+  parameterId: number;
+  name: string;
+  value: T;
+};
+
+export type Experiments = ApiResponseBase<
+  Array<
+    Experiment['data'] & {
+      quantitativeInputs: ExperimentParameter<number>[];
+      qualityInputs: ExperimentParameter<string>[];
+      quantitativeOutputs: ExperimentParameter<number>[];
+      qualityOutputs: ExperimentParameter<string>[];
+    }
+  >
+>;

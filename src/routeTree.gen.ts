@@ -22,7 +22,9 @@ import { Route as AuthResearchIndexImport } from './routes/_auth/research/index'
 import { Route as AuthMachineryParametersIndexImport } from './routes/_auth/machinery-parameters/index'
 import { Route as AuthMachineriesIndexImport } from './routes/_auth/machineries/index'
 import { Route as AuthResearchAddImport } from './routes/_auth/research/add'
+import { Route as AuthResearchResearchIdImport } from './routes/_auth/research/$researchId'
 import { Route as AuthMachineryParametersAddImport } from './routes/_auth/machinery-parameters/add'
+import { Route as AuthResearchResearchIdIndexImport } from './routes/_auth/research/$researchId/index'
 import { Route as AuthResearchResearchIdEditImport } from './routes/_auth/research/$researchId/edit'
 import { Route as AuthMachineryParametersMachineryParameterIdEditImport } from './routes/_auth/machinery-parameters/$machineryParameterId.edit'
 import { Route as AuthMachineriesMachineryIdEditImport } from './routes/_auth/machineries/$machineryId.edit'
@@ -122,6 +124,11 @@ const AuthResearchAddRoute = AuthResearchAddImport.update({
   getParentRoute: () => AuthRoute,
 } as any)
 
+const AuthResearchResearchIdRoute = AuthResearchResearchIdImport.update({
+  path: '/research/$researchId',
+  getParentRoute: () => AuthRoute,
+} as any)
+
 const AuthMachineryParametersAddRoute = AuthMachineryParametersAddImport.update(
   {
     path: '/machinery-parameters/add',
@@ -129,10 +136,16 @@ const AuthMachineryParametersAddRoute = AuthMachineryParametersAddImport.update(
   } as any,
 )
 
+const AuthResearchResearchIdIndexRoute =
+  AuthResearchResearchIdIndexImport.update({
+    path: '/',
+    getParentRoute: () => AuthResearchResearchIdRoute,
+  } as any)
+
 const AuthResearchResearchIdEditRoute = AuthResearchResearchIdEditImport.update(
   {
-    path: '/research/$researchId/edit',
-    getParentRoute: () => AuthRoute,
+    path: '/edit',
+    getParentRoute: () => AuthResearchResearchIdRoute,
   } as any,
 )
 
@@ -215,6 +228,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthMachineryParametersAddImport
       parentRoute: typeof AuthImport
     }
+    '/_auth/research/$researchId': {
+      id: '/_auth/research/$researchId'
+      path: '/research/$researchId'
+      fullPath: '/research/$researchId'
+      preLoaderRoute: typeof AuthResearchResearchIdImport
+      parentRoute: typeof AuthImport
+    }
     '/_auth/research/add': {
       id: '/_auth/research/add'
       path: '/research/add'
@@ -280,10 +300,17 @@ declare module '@tanstack/react-router' {
     }
     '/_auth/research/$researchId/edit': {
       id: '/_auth/research/$researchId/edit'
-      path: '/research/$researchId/edit'
+      path: '/edit'
       fullPath: '/research/$researchId/edit'
       preLoaderRoute: typeof AuthResearchResearchIdEditImport
-      parentRoute: typeof AuthImport
+      parentRoute: typeof AuthResearchResearchIdImport
+    }
+    '/_auth/research/$researchId/': {
+      id: '/_auth/research/$researchId/'
+      path: '/'
+      fullPath: '/research/$researchId/'
+      preLoaderRoute: typeof AuthResearchResearchIdIndexImport
+      parentRoute: typeof AuthResearchResearchIdImport
     }
   }
 }
@@ -299,6 +326,10 @@ export const routeTree = rootRoute.addChildren({
     AuthAboutLazyRoute,
     AuthIndexLazyRoute,
     AuthMachineryParametersAddRoute,
+    AuthResearchResearchIdRoute: AuthResearchResearchIdRoute.addChildren({
+      AuthResearchResearchIdEditRoute,
+      AuthResearchResearchIdIndexRoute,
+    }),
     AuthResearchAddRoute,
     AuthMachineriesAddLazyRoute,
     AuthMachineriesIndexRoute,
@@ -306,7 +337,6 @@ export const routeTree = rootRoute.addChildren({
     AuthResearchIndexRoute,
     AuthMachineriesMachineryIdEditRoute,
     AuthMachineryParametersMachineryParameterIdEditRoute,
-    AuthResearchResearchIdEditRoute,
   }),
   GuestRoute: GuestRoute.addChildren({
     GuestResetPasswordRoute,
@@ -334,14 +364,14 @@ export const routeTree = rootRoute.addChildren({
         "/_auth/about",
         "/_auth/",
         "/_auth/machinery-parameters/add",
+        "/_auth/research/$researchId",
         "/_auth/research/add",
         "/_auth/machineries/add",
         "/_auth/machineries/",
         "/_auth/machinery-parameters/",
         "/_auth/research/",
         "/_auth/machineries/$machineryId/edit",
-        "/_auth/machinery-parameters/$machineryParameterId/edit",
-        "/_auth/research/$researchId/edit"
+        "/_auth/machinery-parameters/$machineryParameterId/edit"
       ]
     },
     "/_guest": {
@@ -384,6 +414,14 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "_auth/machinery-parameters/add.tsx",
       "parent": "/_auth"
     },
+    "/_auth/research/$researchId": {
+      "filePath": "_auth/research/$researchId.tsx",
+      "parent": "/_auth",
+      "children": [
+        "/_auth/research/$researchId/edit",
+        "/_auth/research/$researchId/"
+      ]
+    },
     "/_auth/research/add": {
       "filePath": "_auth/research/add.tsx",
       "parent": "/_auth"
@@ -422,7 +460,11 @@ export const routeTree = rootRoute.addChildren({
     },
     "/_auth/research/$researchId/edit": {
       "filePath": "_auth/research/$researchId/edit.tsx",
-      "parent": "/_auth"
+      "parent": "/_auth/research/$researchId"
+    },
+    "/_auth/research/$researchId/": {
+      "filePath": "_auth/research/$researchId/index.tsx",
+      "parent": "/_auth/research/$researchId"
     }
   }
 }
