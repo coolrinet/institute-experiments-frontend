@@ -12,13 +12,20 @@ import {
   Text,
   Title,
 } from '@mantine/core';
-import { IconEye } from '@tabler/icons-react';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { Link, createFileRoute } from '@tanstack/react-router';
+import { notifications } from '@mantine/notifications';
+import { IconCheck, IconEye, IconTrash, IconX } from '@tabler/icons-react';
+import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { Link, createFileRoute, useRouter } from '@tanstack/react-router';
+import axios from 'axios';
 import { z } from 'zod';
+import { deleteExperiment } from '~/api/experiments/delete-experiment';
 import { getExperimentsQueryOptions } from '~/api/experiments/get-experiments';
 import { getResearchQueryOptions } from '~/api/research/get-research';
 import { getUserFullName } from '~/utils/get-user-full-name';
+
+import { useAuth } from '~/hooks/use-auth';
+
+import { ApiErrorResponse } from '~/types/api';
 
 export const Route = createFileRoute('/_auth/research/$researchId/')({
   validateSearch: z.object({
@@ -37,14 +44,18 @@ export const Route = createFileRoute('/_auth/research/$researchId/')({
 function ShowResearchPage() {
   const { researchId } = Route.useParams();
   const { experimentsPage } = Route.useSearch();
-
   const navigate = Route.useNavigate();
+  const router = useRouter();
+
+  const queryClient = useQueryClient();
 
   const { data: research, isFetching } = useSuspenseQuery(getResearchQueryOptions(researchId));
 
   const { data: experiments, isFetching: isFetchingExperiments } = useSuspenseQuery(
     getExperimentsQueryOptions(researchId, { page: experimentsPage })
   );
+
+  const { user } = useAuth();
 
   const experimentsTotalPages = experiments.meta!.last_page;
 
@@ -53,6 +64,72 @@ function ShowResearchPage() {
       to: '/research/$researchId/experiments/$experimentId',
       params: { experimentId, researchId },
     });
+  };
+
+  const handleDelete = async (experimentId: number) => {
+    const experiment = experiments.data.find(item => item.id === experimentId);
+
+    if (experiment?.user.id !== user?.data.id) {
+      notifications.show({
+        title: 'Неудача',
+        message: 'Нельзя удалить эксперимент, созданный другим пользователем',
+        color: 'red',
+        icon: <IconX size={16} />,
+      });
+      return;
+    }
+
+    const dialogResult = confirm('Вы действительно хотите удалить эксперимент?');
+
+    if (!dialogResult) {
+      return;
+    }
+
+    try {
+      await deleteExperiment(researchId, experimentId);
+
+      await queryClient.invalidateQueries({ queryKey: ['experiments'] });
+
+      await queryClient.invalidateQueries({ queryKey: ['research', researchId] });
+
+      await router.invalidate();
+
+      notifications.show({
+        title: 'Успех',
+        message: 'Эксперимент успешно удалён',
+        color: 'teal',
+        icon: <IconCheck size={16} />,
+      });
+
+      await navigate({ search: { experimentsPage: 1 } });
+    } catch (error) {
+      if (axios.isAxiosError<ApiErrorResponse>(error)) {
+        if (error.response && error.status !== 500) {
+          notifications.show({
+            title: 'Произошла ошибка',
+            message: error.response.data.message,
+            color: 'red',
+            icon: <IconX size={16} />,
+          });
+        } else {
+          console.error(error);
+          notifications.show({
+            title: 'Произошла ошибка',
+            message: 'Произошла непредвиденная ошибка',
+            color: 'red',
+            icon: <IconX size={16} />,
+          });
+        }
+      } else {
+        console.error(error);
+        notifications.show({
+          title: 'Произошла ошибка',
+          message: 'Произошла непредвиденная ошибка',
+          color: 'red',
+          icon: <IconX size={16} />,
+        });
+      }
+    }
   };
 
   const experimentTableRows = experiments.data.map(experiment => (
@@ -67,10 +144,10 @@ function ShowResearchPage() {
           </ActionIcon>
           {/* <ActionIcon onClick={() => handleEdit(item.id)}>
             <IconEdit size={16} />
-          </ActionIcon>
-          <ActionIcon color='red' onClick={() => handleDelete(item.id)}>
-            <IconTrash size={16} />
           </ActionIcon> */}
+          <ActionIcon color='red' onClick={() => handleDelete(experiment.id)}>
+            <IconTrash size={16} />
+          </ActionIcon>
         </ActionIcon.Group>
       </Table.Td>
     </Table.Tr>
