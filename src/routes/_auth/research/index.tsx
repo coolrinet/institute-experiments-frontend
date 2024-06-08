@@ -84,7 +84,11 @@ function ResearchPage() {
   }, 200);
 
   const handleShow = async (researchId: number) => {
-    await navigate({ to: '/research/$researchId', params: { researchId } });
+    await navigate({
+      to: '/research/$researchId',
+      params: { researchId },
+      search: { experimentsPage: 1 },
+    });
   };
 
   const handleDelete = async (researchId: number) => {

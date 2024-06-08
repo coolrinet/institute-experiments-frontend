@@ -1,4 +1,5 @@
 import {
+  ActionIcon,
   Badge,
   Box,
   Button,
@@ -11,6 +12,7 @@ import {
   Text,
   Title,
 } from '@mantine/core';
+import { IconEye } from '@tabler/icons-react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link, createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
@@ -46,12 +48,31 @@ function ShowResearchPage() {
 
   const experimentsTotalPages = experiments.meta!.last_page;
 
+  const handleShow = async (experimentId: number) => {
+    await navigate({
+      to: '/research/$researchId/experiments/$experimentId',
+      params: { experimentId, researchId },
+    });
+  };
+
   const experimentTableRows = experiments.data.map(experiment => (
     <Table.Tr key={experiment.id}>
       <Table.Td>{experiment.name}</Table.Td>
       <Table.Td>{experiment.date}</Table.Td>
       <Table.Td>{getUserFullName(experiment.user)}</Table.Td>
-      <Table.Td>Какие-то действия</Table.Td>
+      <Table.Td>
+        <ActionIcon.Group>
+          <ActionIcon color='teal' onClick={() => handleShow(experiment.id)}>
+            <IconEye size={16} />
+          </ActionIcon>
+          {/* <ActionIcon onClick={() => handleEdit(item.id)}>
+            <IconEdit size={16} />
+          </ActionIcon>
+          <ActionIcon color='red' onClick={() => handleDelete(item.id)}>
+            <IconTrash size={16} />
+          </ActionIcon> */}
+        </ActionIcon.Group>
+      </Table.Td>
     </Table.Tr>
   ));
 

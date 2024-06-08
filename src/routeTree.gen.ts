@@ -28,6 +28,7 @@ import { Route as AuthResearchResearchIdIndexImport } from './routes/_auth/resea
 import { Route as AuthResearchResearchIdEditImport } from './routes/_auth/research/$researchId/edit'
 import { Route as AuthMachineryParametersMachineryParameterIdEditImport } from './routes/_auth/machinery-parameters/$machineryParameterId.edit'
 import { Route as AuthMachineriesMachineryIdEditImport } from './routes/_auth/machineries/$machineryId.edit'
+import { Route as AuthResearchResearchIdExperimentsExperimentIdIndexImport } from './routes/_auth/research/$researchId/experiments/$experimentId/index'
 
 // Create Virtual Routes
 
@@ -36,7 +37,6 @@ const GuestLoginLazyImport = createFileRoute('/_guest/login')()
 const GuestForgotPasswordLazyImport = createFileRoute(
   '/_guest/forgot-password',
 )()
-const AuthAboutLazyImport = createFileRoute('/_auth/about')()
 const AuthUsersAddLazyImport = createFileRoute('/_auth/users/add')()
 const AuthMachineriesAddLazyImport = createFileRoute('/_auth/machineries/add')()
 
@@ -68,11 +68,6 @@ const GuestForgotPasswordLazyRoute = GuestForgotPasswordLazyImport.update({
 } as any).lazy(() =>
   import('./routes/_guest/forgot-password.lazy').then((d) => d.Route),
 )
-
-const AuthAboutLazyRoute = AuthAboutLazyImport.update({
-  path: '/about',
-  getParentRoute: () => AuthRoute,
-} as any).lazy(() => import('./routes/_auth/about.lazy').then((d) => d.Route))
 
 const GuestResetPasswordRoute = GuestResetPasswordImport.update({
   path: '/reset-password',
@@ -161,6 +156,12 @@ const AuthMachineriesMachineryIdEditRoute =
     getParentRoute: () => AuthRoute,
   } as any)
 
+const AuthResearchResearchIdExperimentsExperimentIdIndexRoute =
+  AuthResearchResearchIdExperimentsExperimentIdIndexImport.update({
+    path: '/experiments/$experimentId/',
+    getParentRoute: () => AuthResearchResearchIdRoute,
+  } as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -192,13 +193,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/reset-password'
       preLoaderRoute: typeof GuestResetPasswordImport
       parentRoute: typeof GuestImport
-    }
-    '/_auth/about': {
-      id: '/_auth/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AuthAboutLazyImport
-      parentRoute: typeof AuthImport
     }
     '/_guest/forgot-password': {
       id: '/_guest/forgot-password'
@@ -312,6 +306,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthResearchResearchIdIndexImport
       parentRoute: typeof AuthResearchResearchIdImport
     }
+    '/_auth/research/$researchId/experiments/$experimentId/': {
+      id: '/_auth/research/$researchId/experiments/$experimentId/'
+      path: '/experiments/$experimentId'
+      fullPath: '/research/$researchId/experiments/$experimentId'
+      preLoaderRoute: typeof AuthResearchResearchIdExperimentsExperimentIdIndexImport
+      parentRoute: typeof AuthResearchResearchIdImport
+    }
   }
 }
 
@@ -323,12 +324,12 @@ export const routeTree = rootRoute.addChildren({
       AuthUsersAddLazyRoute,
       AuthUsersIndexRoute,
     }),
-    AuthAboutLazyRoute,
     AuthIndexLazyRoute,
     AuthMachineryParametersAddRoute,
     AuthResearchResearchIdRoute: AuthResearchResearchIdRoute.addChildren({
       AuthResearchResearchIdEditRoute,
       AuthResearchResearchIdIndexRoute,
+      AuthResearchResearchIdExperimentsExperimentIdIndexRoute,
     }),
     AuthResearchAddRoute,
     AuthMachineriesAddLazyRoute,
@@ -361,7 +362,6 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "_auth.tsx",
       "children": [
         "/_auth/users",
-        "/_auth/about",
         "/_auth/",
         "/_auth/machinery-parameters/add",
         "/_auth/research/$researchId",
@@ -394,10 +394,6 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "_guest/reset-password.tsx",
       "parent": "/_guest"
     },
-    "/_auth/about": {
-      "filePath": "_auth/about.lazy.tsx",
-      "parent": "/_auth"
-    },
     "/_guest/forgot-password": {
       "filePath": "_guest/forgot-password.lazy.tsx",
       "parent": "/_guest"
@@ -419,7 +415,8 @@ export const routeTree = rootRoute.addChildren({
       "parent": "/_auth",
       "children": [
         "/_auth/research/$researchId/edit",
-        "/_auth/research/$researchId/"
+        "/_auth/research/$researchId/",
+        "/_auth/research/$researchId/experiments/$experimentId/"
       ]
     },
     "/_auth/research/add": {
@@ -464,6 +461,10 @@ export const routeTree = rootRoute.addChildren({
     },
     "/_auth/research/$researchId/": {
       "filePath": "_auth/research/$researchId/index.tsx",
+      "parent": "/_auth/research/$researchId"
+    },
+    "/_auth/research/$researchId/experiments/$experimentId/": {
+      "filePath": "_auth/research/$researchId/experiments/$experimentId/index.tsx",
       "parent": "/_auth/research/$researchId"
     }
   }
