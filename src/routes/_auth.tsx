@@ -1,4 +1,4 @@
-import { AppShell, Burger, Button, Group, NavLink } from '@mantine/core';
+import { AppShell, Box, Burger, Button, Group, LoadingOverlay, NavLink } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import {
@@ -103,59 +103,62 @@ function AuthLayout() {
         collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
       }}
     >
-      <AppShell.Header bg='blue'>
-        <Group h='100%' justify='space-between' px='md'>
-          <Burger
-            color='white'
-            opened={mobileOpened}
-            onClick={toggleMobile}
-            hiddenFrom='sm'
-            size='sm'
-          />
-          <Burger
-            color='white'
-            opened={desktopOpened}
-            onClick={toggleDesktop}
-            visibleFrom='sm'
-            size='sm'
-          />
-          <Button variant='white' onClick={handleLogout} disabled={isPending} loading={isPending}>
-            Выйти из системы
-          </Button>
-        </Group>
-      </AppShell.Header>
-      <AppShell.Navbar>
-        <NavLink
-          leftSection={<IconHome size={16} />}
-          label='Главная'
-          renderRoot={props => <Link to='/' {...props} />}
-        />
-        <NavLink
-          leftSection={<IconBuildingFactory size={16} />}
-          label='Установки'
-          renderRoot={props => <Link to='/machineries' {...props} />}
-        />
-        <NavLink
-          leftSection={<IconSettings size={16} />}
-          label='Параметры установок'
-          renderRoot={props => <Link to='/machinery-parameters' {...props} />}
-        />
-        <NavLink
-          leftSection={<IconReportSearch size={16} />}
-          label='Исследования'
-          renderRoot={props => <Link to='/research' {...props} />}
-        />
-        {user?.data.isAdmin && (
+      <Box pos='relative'>
+        <LoadingOverlay visible={isPending} />
+        <AppShell.Header bg='blue'>
+          <Group h='100%' justify='space-between' px='md'>
+            <Burger
+              color='white'
+              opened={mobileOpened}
+              onClick={toggleMobile}
+              hiddenFrom='sm'
+              size='sm'
+            />
+            <Burger
+              color='white'
+              opened={desktopOpened}
+              onClick={toggleDesktop}
+              visibleFrom='sm'
+              size='sm'
+            />
+            <Button variant='white' onClick={handleLogout} disabled={isPending} loading={isPending}>
+              Выйти из системы
+            </Button>
+          </Group>
+        </AppShell.Header>
+        <AppShell.Navbar>
           <NavLink
-            leftSection={<IconUsers size={16} />}
-            label='Пользователи'
-            renderRoot={props => <Link to='/users' {...props} />}
+            leftSection={<IconHome size={16} />}
+            label='Главная'
+            renderRoot={props => <Link to='/' {...props} />}
           />
-        )}
-      </AppShell.Navbar>
-      <AppShell.Main>
-        <Outlet />
-      </AppShell.Main>
+          <NavLink
+            leftSection={<IconBuildingFactory size={16} />}
+            label='Установки'
+            renderRoot={props => <Link to='/machineries' {...props} />}
+          />
+          <NavLink
+            leftSection={<IconSettings size={16} />}
+            label='Параметры установок'
+            renderRoot={props => <Link to='/machinery-parameters' {...props} />}
+          />
+          <NavLink
+            leftSection={<IconReportSearch size={16} />}
+            label='Исследования'
+            renderRoot={props => <Link to='/research' {...props} />}
+          />
+          {user?.data.isAdmin && (
+            <NavLink
+              leftSection={<IconUsers size={16} />}
+              label='Пользователи'
+              renderRoot={props => <Link to='/users' {...props} />}
+            />
+          )}
+        </AppShell.Navbar>
+        <AppShell.Main>
+          <Outlet />
+        </AppShell.Main>
+      </Box>
     </AppShell>
   );
 }
