@@ -157,17 +157,19 @@ function MachineryParametersPage() {
         <Table.Td>{getUserFullName(machineryParameter.user)}</Table.Td>
         <Table.Td>
           <ActionIcon.Group>
-            <ActionIcon
-              renderRoot={props => (
-                <Link
-                  to='/machinery-parameters/$machineryParameterId/edit'
-                  params={{ machineryParameterId: machineryParameter.id }}
-                  {...props}
-                />
-              )}
-            >
-              <IconEdit size={16} />
-            </ActionIcon>
+            {machineryParameter.user.id === user?.data.id && (
+              <ActionIcon
+                renderRoot={props => (
+                  <Link
+                    to='/machinery-parameters/$machineryParameterId/edit'
+                    params={{ machineryParameterId: machineryParameter.id }}
+                    {...props}
+                  />
+                )}
+              >
+                <IconEdit size={16} />
+              </ActionIcon>
+            )}
             <ActionIcon color='red' onClick={() => handleDelete(machineryParameter.id)}>
               <IconTrash size={16} />
             </ActionIcon>

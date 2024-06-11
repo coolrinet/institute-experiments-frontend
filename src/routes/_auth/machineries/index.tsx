@@ -142,17 +142,19 @@ function MachineriesPage() {
         <Table.Td>{getUserFullName(machinery.user)}</Table.Td>
         <Table.Td>
           <ActionIcon.Group>
-            <ActionIcon
-              renderRoot={props => (
-                <Link
-                  to='/machineries/$machineryId/edit'
-                  params={{ machineryId: machinery.id }}
-                  {...props}
-                />
-              )}
-            >
-              <IconEdit size={16} />
-            </ActionIcon>
+            {machinery.user.id === user?.data.id && (
+              <ActionIcon
+                renderRoot={props => (
+                  <Link
+                    to='/machineries/$machineryId/edit'
+                    params={{ machineryId: machinery.id }}
+                    {...props}
+                  />
+                )}
+              >
+                <IconEdit size={16} />
+              </ActionIcon>
+            )}
             <ActionIcon color='red' onClick={() => handleDelete(machinery.id)}>
               <IconTrash size={16} />
             </ActionIcon>

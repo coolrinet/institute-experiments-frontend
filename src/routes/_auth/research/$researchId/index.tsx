@@ -149,12 +149,16 @@ function ShowResearchPage() {
           <ActionIcon color='teal' onClick={() => handleShow(experiment.id)}>
             <IconEye size={16} />
           </ActionIcon>
-          <ActionIcon onClick={() => handleEdit(experiment.id)}>
-            <IconEdit size={16} />
-          </ActionIcon>
-          <ActionIcon color='red' onClick={() => handleDelete(experiment.id)}>
-            <IconTrash size={16} />
-          </ActionIcon>
+          {!research.data.isPublic && experiment.user.id === user?.data.id && (
+            <>
+              <ActionIcon onClick={() => handleEdit(experiment.id)}>
+                <IconEdit size={16} />
+              </ActionIcon>
+              <ActionIcon color='red' onClick={() => handleDelete(experiment.id)}>
+                <IconTrash size={16} />
+              </ActionIcon>
+            </>
+          )}
         </ActionIcon.Group>
       </Table.Td>
     </Table.Tr>
@@ -255,17 +259,19 @@ function ShowResearchPage() {
                   onChange={onExperimentsPageChange}
                 />
               )}
-              <Button
-                renderRoot={props => (
-                  <Link
-                    {...props}
-                    to='/research/$researchId/experiments/add'
-                    params={{ researchId }}
-                  />
-                )}
-              >
-                Добавить эксперимент
-              </Button>
+              {!research.data.isPublic && (
+                <Button
+                  renderRoot={props => (
+                    <Link
+                      {...props}
+                      to='/research/$researchId/experiments/add'
+                      params={{ researchId }}
+                    />
+                  )}
+                >
+                  Добавить эксперимент
+                </Button>
+              )}
             </Group>
           </Stack>
         </Card>

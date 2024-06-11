@@ -183,6 +183,7 @@ function ResearchPage() {
         <Table.Td>{item.name}</Table.Td>
         <Table.Td>{item.description || '-'}</Table.Td>
         <Table.Td>{item.lastExperimentDate || '-'}</Table.Td>
+        <Table.Td>{item.isPublic ? 'Публичный' : 'Частный'}</Table.Td>
         <Table.Td>{item.machinery.name}</Table.Td>
         <Table.Td>{userFullName}</Table.Td>
         <Table.Td>
@@ -190,12 +191,16 @@ function ResearchPage() {
             <ActionIcon color='teal' onClick={() => handleShow(item.id)}>
               <IconEye size={16} />
             </ActionIcon>
-            <ActionIcon onClick={() => handleEdit(item.id)}>
-              <IconEdit size={16} />
-            </ActionIcon>
-            <ActionIcon color='red' onClick={() => handleDelete(item.id)}>
-              <IconTrash size={16} />
-            </ActionIcon>
+            {user?.data.id === item.author.id && (
+              <>
+                <ActionIcon onClick={() => handleEdit(item.id)}>
+                  <IconEdit size={16} />
+                </ActionIcon>
+                <ActionIcon color='red' onClick={() => handleDelete(item.id)}>
+                  <IconTrash size={16} />
+                </ActionIcon>
+              </>
+            )}
           </ActionIcon.Group>
         </Table.Td>
       </Table.Tr>
@@ -238,6 +243,7 @@ function ResearchPage() {
                     <Table.Th>Название</Table.Th>
                     <Table.Th>Описание</Table.Th>
                     <Table.Th>Дата последнего эксперимента</Table.Th>
+                    <Table.Th>Тип видимости</Table.Th>
                     <Table.Th>Используемая установка</Table.Th>
                     <Table.Th>Автор</Table.Th>
                     <Table.Th />
