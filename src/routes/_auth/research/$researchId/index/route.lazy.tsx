@@ -13,14 +13,25 @@ import {
   Title,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconArrowLeft, IconCheck, IconEdit, IconEye, IconTrash, IconX } from '@tabler/icons-react';
+import {
+  IconArrowLeft,
+  IconCheck,
+  IconEdit,
+  IconEye,
+  IconFileExport,
+  IconTrash,
+  IconX,
+} from '@tabler/icons-react';
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { Link, createLazyFileRoute, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { CSVLink } from 'react-csv';
 import { deleteExperiment } from '~/api/experiments/delete-experiment';
 import { getExperimentsQueryOptions } from '~/api/experiments/get-experiments';
 import { getResearchQueryOptions } from '~/api/research/get-research';
 import { getUserFullName } from '~/utils/get-user-full-name';
+import { prepareExperimentsForExport } from '~/utils/prepare-experiments-for-export';
 
 import PageLoader from '~/components/Loader';
 
@@ -46,6 +57,16 @@ function ShowResearchPage() {
   const { data: experiments, isFetching: isFetchingExperiments } = useSuspenseQuery(
     getExperimentsQueryOptions(researchId, { page: experimentsPage })
   );
+
+  const [exportData, setExportData] = useState<any[]>([]);
+  const [exportHeaders, setExportHeaders] = useState<any[]>([]);
+
+  useEffect(() => {
+    prepareExperimentsForExport(researchId).then(({ data, headers }) => {
+      setExportData(data);
+      setExportHeaders(headers);
+    });
+  }, [researchId]);
 
   const { user } = useAuth();
 
@@ -179,50 +200,61 @@ function ShowResearchPage() {
         <LoadingOverlay visible={isFetching || isFetchingExperiments} />
         <Card withBorder w='100%' mx='auto' padding='xl' radius='md' shadow='xl'>
           <Card.Section withBorder inheritPadding py='md'>
-            <Stack gap='xs'>
-              <Text>
-                <Text span fw='bold' fs='italic'>
-                  Название:
-                </Text>{' '}
-                {research.data.name}
-              </Text>
-              <Text>
-                <Text span fw='bold' fs='italic'>
-                  Описание:
-                </Text>{' '}
-                {research.data.description}
-              </Text>
-              <Text>
-                <Text span fw='bold' fs='italic'>
-                  Дата последнего эксперимента:
-                </Text>{' '}
-                {research.data.lastExperimentDate}
-              </Text>
-              <Text>
-                <Text span fw='bold' fs='italic'>
-                  Установка:
-                </Text>{' '}
-                {research.data.machinery.name}
-              </Text>
-              <Text>
-                <Text span fw='bold' fs='italic'>
-                  Автор исследования:
-                </Text>{' '}
-                {getUserFullName(research.data.author)}
-              </Text>
-              {!research.data.isPublic && (
-                <Group>
-                  <Text fw='bold' fs='italic'>
-                    Участники:{' '}
-                  </Text>
-                  <Group gap='xs'>
-                    {research.data.participants?.map(participant => (
-                      <Badge key={participant.id}>{getUserFullName(participant)}</Badge>
-                    ))}
+            <Group justify='space-between'>
+              <Stack gap='xs'>
+                <Text>
+                  <Text span fw='bold' fs='italic'>
+                    Название:
+                  </Text>{' '}
+                  {research.data.name}
+                </Text>
+                <Text>
+                  <Text span fw='bold' fs='italic'>
+                    Описание:
+                  </Text>{' '}
+                  {research.data.description}
+                </Text>
+                <Text>
+                  <Text span fw='bold' fs='italic'>
+                    Дата последнего эксперимента:
+                  </Text>{' '}
+                  {research.data.lastExperimentDate}
+                </Text>
+                <Text>
+                  <Text span fw='bold' fs='italic'>
+                    Установка:
+                  </Text>{' '}
+                  {research.data.machinery.name}
+                </Text>
+                <Text>
+                  <Text span fw='bold' fs='italic'>
+                    Автор исследования:
+                  </Text>{' '}
+                  {getUserFullName(research.data.author)}
+                </Text>
+                {!research.data.isPublic && (
+                  <Group>
+                    <Text fw='bold' fs='italic'>
+                      Участники:{' '}
+                    </Text>
+                    <Group gap='xs'>
+                      {research.data.participants?.map(participant => (
+                        <Badge key={participant.id}>{getUserFullName(participant)}</Badge>
+                      ))}
+                    </Group>
                   </Group>
-                </Group>
-              )}
-            </Stack>
+                )}
+              </Stack>
+              <Button
+                color='teal'
+                leftSection={<IconFileExport size={16} />}
+                renderRoot={props => (
+                  <CSVLink {...props} data={exportData} headers={exportHeaders} />
+                )}
+              >
+                Экспортировать в CSV
+              </Button>
+            </Group>
           </Card.Section>
           <Stack mt='sm'>
             <Title order={2}>Эксперименты исследования</Title>

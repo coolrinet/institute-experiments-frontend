@@ -6,11 +6,15 @@ import { Experiments } from '~/types/api';
 
 type ExperimentParams = {
   page?: number;
+  withParameters?: boolean;
 };
 
-async function getExperiments(researchId: number, params: ExperimentParams) {
+export async function getExperiments(researchId: number, params: ExperimentParams) {
   const response = await apiClient.get<Experiments>(`/api/research/${researchId}/experiments`, {
-    params,
+    params: {
+      page: params.page,
+      with_parameters: params.withParameters,
+    },
   });
 
   return response.data;

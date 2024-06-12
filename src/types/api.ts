@@ -71,10 +71,10 @@ export type Experiment = ApiResponseBase<{
   name: string;
   date: string;
   user: User['data'];
-  quantitativeInputs: ExperimentParameter<number>[];
-  qualityInputs: ExperimentParameter<string>[];
-  quantitativeOutputs: ExperimentParameter<number>[];
-  qualityOutputs: ExperimentParameter<string>[];
+  quantitativeInputs?: ExperimentParameter<number>[];
+  qualityInputs?: ExperimentParameter<string>[];
+  quantitativeOutputs?: ExperimentParameter<number>[];
+  qualityOutputs?: ExperimentParameter<string>[];
 }>;
 
 type ExperimentParameter<T> = {
@@ -83,11 +83,4 @@ type ExperimentParameter<T> = {
   value: T;
 };
 
-export type Experiments = ApiResponseBase<
-  Array<
-    Omit<
-      Experiment['data'],
-      'quantitativeInputs' | 'qualityInputs' | 'quantitativeOutputs' | 'qualityOutputs'
-    >
-  >
->;
+export type Experiments = ApiResponseBase<Array<Experiment['data']>>;
