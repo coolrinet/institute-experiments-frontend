@@ -16,9 +16,8 @@ import { useDebouncedCallback } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { IconCheck, IconEdit, IconSearch, IconTrash, IconX } from '@tabler/icons-react';
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { Link, createFileRoute, useRouter } from '@tanstack/react-router';
+import { Link, createLazyFileRoute, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
-import { z } from 'zod';
 import { deleteMachinery } from '~/api/machineries/delete-machinery';
 import { getMachineriesQueryOptions } from '~/api/machineries/get-machineries';
 import { getUserFullName } from '~/utils/get-user-full-name';
@@ -29,14 +28,7 @@ import { useAuth } from '~/hooks/use-auth';
 
 import { ApiErrorResponse } from '~/types/api';
 
-export const Route = createFileRoute('/_auth/machineries/')({
-  validateSearch: z.object({
-    page: z.number().optional().default(1),
-    name: z.string().optional().catch(''),
-  }),
-  loaderDeps: ({ search }) => search,
-  loader: ({ context, deps }) =>
-    context.queryClient.ensureQueryData(getMachineriesQueryOptions(deps)),
+export const Route = createLazyFileRoute('/_auth/machineries/')({
   component: MachineriesPage,
   pendingComponent: PageLoader,
 });

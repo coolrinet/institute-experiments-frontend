@@ -11,18 +11,13 @@ import {
 } from '@mantine/core';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute } from '@tanstack/react-router';
+import { createLazyFileRoute } from '@tanstack/react-router';
 import { getExperimentQueryOptions } from '~/api/experiments/get-experiment';
 import { getUserFullName } from '~/utils/get-user-full-name';
 
 import PageLoader from '~/components/Loader';
 
-export const Route = createFileRoute('/_auth/research/$researchId/experiments/$experimentId/')({
-  loader: ({ context, params }) => {
-    context.queryClient.ensureQueryData(
-      getExperimentQueryOptions(params.researchId, params.experimentId)
-    );
-  },
+export const Route = createLazyFileRoute('/_auth/research/$researchId/experiments/$experimentId/')({
   component: ExperimentPage,
   pendingComponent: PageLoader,
 });

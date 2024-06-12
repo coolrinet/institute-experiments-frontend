@@ -15,30 +15,22 @@ import {
 import { notifications } from '@mantine/notifications';
 import { IconArrowLeft, IconCheck, IconEdit, IconEye, IconTrash, IconX } from '@tabler/icons-react';
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { Link, createFileRoute, useRouter } from '@tanstack/react-router';
+import { Link, createLazyFileRoute, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
-import { z } from 'zod';
 import { deleteExperiment } from '~/api/experiments/delete-experiment';
 import { getExperimentsQueryOptions } from '~/api/experiments/get-experiments';
 import { getResearchQueryOptions } from '~/api/research/get-research';
 import { getUserFullName } from '~/utils/get-user-full-name';
 
+import PageLoader from '~/components/Loader';
+
 import { useAuth } from '~/hooks/use-auth';
 
 import { ApiErrorResponse } from '~/types/api';
 
-export const Route = createFileRoute('/_auth/research/$researchId/')({
-  validateSearch: z.object({
-    experimentsPage: z.number().optional().default(1),
-  }),
-  loaderDeps: ({ search }) => search,
-  loader: ({ context, params, deps }) => {
-    context.queryClient.ensureQueryData(getResearchQueryOptions(params.researchId));
-    context.queryClient.ensureQueryData(
-      getExperimentsQueryOptions(params.researchId, { page: deps.experimentsPage })
-    );
-  },
+export const Route = createLazyFileRoute('/_auth/research/$researchId/')({
   component: ShowResearchPage,
+  pendingComponent: PageLoader,
 });
 
 function ShowResearchPage() {

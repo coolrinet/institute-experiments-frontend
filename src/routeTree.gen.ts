@@ -13,25 +13,25 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as GuestImport } from './routes/_guest'
-import { Route as AuthImport } from './routes/_auth'
-import { Route as GuestResetPasswordImport } from './routes/_guest/reset-password'
-import { Route as AuthUsersImport } from './routes/_auth/users'
-import { Route as AuthUsersIndexImport } from './routes/_auth/users/index'
-import { Route as AuthResearchIndexImport } from './routes/_auth/research/index'
-import { Route as AuthMachineryParametersIndexImport } from './routes/_auth/machinery-parameters/index'
-import { Route as AuthMachineriesIndexImport } from './routes/_auth/machineries/index'
-import { Route as AuthResearchAddImport } from './routes/_auth/research/add'
-import { Route as AuthResearchResearchIdImport } from './routes/_auth/research/$researchId'
-import { Route as AuthMachineryParametersAddImport } from './routes/_auth/machinery-parameters/add'
-import { Route as AuthResearchResearchIdIndexImport } from './routes/_auth/research/$researchId/index'
-import { Route as AuthResearchResearchIdEditImport } from './routes/_auth/research/$researchId/edit'
-import { Route as AuthMachineryParametersMachineryParameterIdEditImport } from './routes/_auth/machinery-parameters/$machineryParameterId.edit'
-import { Route as AuthMachineriesMachineryIdEditImport } from './routes/_auth/machineries/$machineryId.edit'
-import { Route as AuthResearchResearchIdExperimentsAddImport } from './routes/_auth/research/$researchId/experiments/add'
-import { Route as AuthResearchResearchIdExperimentsExperimentIdImport } from './routes/_auth/research/$researchId/experiments/$experimentId'
-import { Route as AuthResearchResearchIdExperimentsExperimentIdIndexImport } from './routes/_auth/research/$researchId/experiments/$experimentId/index'
-import { Route as AuthResearchResearchIdExperimentsExperimentIdEditImport } from './routes/_auth/research/$researchId/experiments/$experimentId/edit'
+import { Route as GuestRouteImport } from './routes/_guest/route'
+import { Route as AuthRouteImport } from './routes/_auth/route'
+import { Route as GuestResetPasswordRouteImport } from './routes/_guest/reset-password/route'
+import { Route as AuthUsersRouteImport } from './routes/_auth/users/route'
+import { Route as AuthResearchAddRouteImport } from './routes/_auth/research/add/route'
+import { Route as AuthResearchResearchIdRouteImport } from './routes/_auth/research/$researchId/route'
+import { Route as AuthMachineryParametersAddRouteImport } from './routes/_auth/machinery-parameters/add/route'
+import { Route as AuthUsersIndexRouteImport } from './routes/_auth/users/index/route'
+import { Route as AuthResearchIndexRouteImport } from './routes/_auth/research/index/route'
+import { Route as AuthMachineryParametersIndexRouteImport } from './routes/_auth/machinery-parameters/index/route'
+import { Route as AuthMachineriesIndexRouteImport } from './routes/_auth/machineries/index/route'
+import { Route as AuthResearchResearchIdEditRouteImport } from './routes/_auth/research/$researchId/edit/route'
+import { Route as AuthMachineryParametersMachineryParameterIdEditRouteImport } from './routes/_auth/machinery-parameters/$machineryParameterId.edit/route'
+import { Route as AuthMachineriesMachineryIdEditRouteImport } from './routes/_auth/machineries/$machineryId.edit/route'
+import { Route as AuthResearchResearchIdIndexRouteImport } from './routes/_auth/research/$researchId/index/route'
+import { Route as AuthResearchResearchIdExperimentsAddRouteImport } from './routes/_auth/research/$researchId/experiments/add/route'
+import { Route as AuthResearchResearchIdExperimentsExperimentIdRouteImport } from './routes/_auth/research/$researchId/experiments/$experimentId/route'
+import { Route as AuthResearchResearchIdExperimentsExperimentIdEditRouteImport } from './routes/_auth/research/$researchId/experiments/$experimentId/edit/route'
+import { Route as AuthResearchResearchIdExperimentsExperimentIdIndexRouteImport } from './routes/_auth/research/$researchId/experiments/$experimentId/index/route'
 
 // Create Virtual Routes
 
@@ -45,143 +45,198 @@ const AuthMachineriesAddLazyImport = createFileRoute('/_auth/machineries/add')()
 
 // Create/Update Routes
 
-const GuestRoute = GuestImport.update({
+const GuestRouteRoute = GuestRouteImport.update({
   id: '/_guest',
   getParentRoute: () => rootRoute,
-} as any)
+} as any).lazy(() => import('./routes/_guest/route.lazy').then((d) => d.Route))
 
-const AuthRoute = AuthImport.update({
+const AuthRouteRoute = AuthRouteImport.update({
   id: '/_auth',
   getParentRoute: () => rootRoute,
-} as any)
+} as any).lazy(() => import('./routes/_auth/route.lazy').then((d) => d.Route))
 
 const AuthIndexLazyRoute = AuthIndexLazyImport.update({
   path: '/',
-  getParentRoute: () => AuthRoute,
+  getParentRoute: () => AuthRouteRoute,
 } as any).lazy(() => import('./routes/_auth/index.lazy').then((d) => d.Route))
 
 const GuestLoginLazyRoute = GuestLoginLazyImport.update({
   path: '/login',
-  getParentRoute: () => GuestRoute,
+  getParentRoute: () => GuestRouteRoute,
 } as any).lazy(() => import('./routes/_guest/login.lazy').then((d) => d.Route))
 
 const GuestForgotPasswordLazyRoute = GuestForgotPasswordLazyImport.update({
   path: '/forgot-password',
-  getParentRoute: () => GuestRoute,
+  getParentRoute: () => GuestRouteRoute,
 } as any).lazy(() =>
   import('./routes/_guest/forgot-password.lazy').then((d) => d.Route),
 )
 
-const GuestResetPasswordRoute = GuestResetPasswordImport.update({
+const GuestResetPasswordRouteRoute = GuestResetPasswordRouteImport.update({
   path: '/reset-password',
-  getParentRoute: () => GuestRoute,
-} as any)
+  getParentRoute: () => GuestRouteRoute,
+} as any).lazy(() =>
+  import('./routes/_guest/reset-password/route.lazy').then((d) => d.Route),
+)
 
-const AuthUsersRoute = AuthUsersImport.update({
+const AuthUsersRouteRoute = AuthUsersRouteImport.update({
   path: '/users',
-  getParentRoute: () => AuthRoute,
-} as any)
-
-const AuthUsersIndexRoute = AuthUsersIndexImport.update({
-  path: '/',
-  getParentRoute: () => AuthUsersRoute,
-} as any)
-
-const AuthResearchIndexRoute = AuthResearchIndexImport.update({
-  path: '/research/',
-  getParentRoute: () => AuthRoute,
-} as any)
-
-const AuthMachineryParametersIndexRoute =
-  AuthMachineryParametersIndexImport.update({
-    path: '/machinery-parameters/',
-    getParentRoute: () => AuthRoute,
-  } as any)
-
-const AuthMachineriesIndexRoute = AuthMachineriesIndexImport.update({
-  path: '/machineries/',
-  getParentRoute: () => AuthRoute,
+  getParentRoute: () => AuthRouteRoute,
 } as any)
 
 const AuthUsersAddLazyRoute = AuthUsersAddLazyImport.update({
   path: '/add',
-  getParentRoute: () => AuthUsersRoute,
+  getParentRoute: () => AuthUsersRouteRoute,
 } as any).lazy(() =>
   import('./routes/_auth/users/add.lazy').then((d) => d.Route),
 )
 
 const AuthMachineriesAddLazyRoute = AuthMachineriesAddLazyImport.update({
   path: '/machineries/add',
-  getParentRoute: () => AuthRoute,
+  getParentRoute: () => AuthRouteRoute,
 } as any).lazy(() =>
   import('./routes/_auth/machineries/add.lazy').then((d) => d.Route),
 )
 
-const AuthResearchAddRoute = AuthResearchAddImport.update({
+const AuthResearchAddRouteRoute = AuthResearchAddRouteImport.update({
   path: '/research/add',
-  getParentRoute: () => AuthRoute,
-} as any)
+  getParentRoute: () => AuthRouteRoute,
+} as any).lazy(() =>
+  import('./routes/_auth/research/add/route.lazy').then((d) => d.Route),
+)
 
-const AuthResearchResearchIdRoute = AuthResearchResearchIdImport.update({
-  path: '/research/$researchId',
-  getParentRoute: () => AuthRoute,
-} as any)
+const AuthResearchResearchIdRouteRoute =
+  AuthResearchResearchIdRouteImport.update({
+    path: '/research/$researchId',
+    getParentRoute: () => AuthRouteRoute,
+  } as any).lazy(() =>
+    import('./routes/_auth/research/$researchId/route.lazy').then(
+      (d) => d.Route,
+    ),
+  )
 
-const AuthMachineryParametersAddRoute = AuthMachineryParametersAddImport.update(
-  {
+const AuthMachineryParametersAddRouteRoute =
+  AuthMachineryParametersAddRouteImport.update({
     path: '/machinery-parameters/add',
-    getParentRoute: () => AuthRoute,
-  } as any,
+    getParentRoute: () => AuthRouteRoute,
+  } as any).lazy(() =>
+    import('./routes/_auth/machinery-parameters/add/route.lazy').then(
+      (d) => d.Route,
+    ),
+  )
+
+const AuthUsersIndexRouteRoute = AuthUsersIndexRouteImport.update({
+  path: '/',
+  getParentRoute: () => AuthUsersRouteRoute,
+} as any).lazy(() =>
+  import('./routes/_auth/users/index/route.lazy').then((d) => d.Route),
 )
 
-const AuthResearchResearchIdIndexRoute =
-  AuthResearchResearchIdIndexImport.update({
-    path: '/',
-    getParentRoute: () => AuthResearchResearchIdRoute,
-  } as any)
+const AuthResearchIndexRouteRoute = AuthResearchIndexRouteImport.update({
+  path: '/research/',
+  getParentRoute: () => AuthRouteRoute,
+} as any).lazy(() =>
+  import('./routes/_auth/research/index/route.lazy').then((d) => d.Route),
+)
 
-const AuthResearchResearchIdEditRoute = AuthResearchResearchIdEditImport.update(
-  {
+const AuthMachineryParametersIndexRouteRoute =
+  AuthMachineryParametersIndexRouteImport.update({
+    path: '/machinery-parameters/',
+    getParentRoute: () => AuthRouteRoute,
+  } as any).lazy(() =>
+    import('./routes/_auth/machinery-parameters/index/route.lazy').then(
+      (d) => d.Route,
+    ),
+  )
+
+const AuthMachineriesIndexRouteRoute = AuthMachineriesIndexRouteImport.update({
+  path: '/machineries/',
+  getParentRoute: () => AuthRouteRoute,
+} as any).lazy(() =>
+  import('./routes/_auth/machineries/index/route.lazy').then((d) => d.Route),
+)
+
+const AuthResearchResearchIdEditRouteRoute =
+  AuthResearchResearchIdEditRouteImport.update({
     path: '/edit',
-    getParentRoute: () => AuthResearchResearchIdRoute,
-  } as any,
-)
+    getParentRoute: () => AuthResearchResearchIdRouteRoute,
+  } as any).lazy(() =>
+    import('./routes/_auth/research/$researchId/edit/route.lazy').then(
+      (d) => d.Route,
+    ),
+  )
 
-const AuthMachineryParametersMachineryParameterIdEditRoute =
-  AuthMachineryParametersMachineryParameterIdEditImport.update({
+const AuthMachineryParametersMachineryParameterIdEditRouteRoute =
+  AuthMachineryParametersMachineryParameterIdEditRouteImport.update({
     path: '/machinery-parameters/$machineryParameterId/edit',
-    getParentRoute: () => AuthRoute,
-  } as any)
+    getParentRoute: () => AuthRouteRoute,
+  } as any).lazy(() =>
+    import(
+      './routes/_auth/machinery-parameters/$machineryParameterId.edit/route.lazy'
+    ).then((d) => d.Route),
+  )
 
-const AuthMachineriesMachineryIdEditRoute =
-  AuthMachineriesMachineryIdEditImport.update({
+const AuthMachineriesMachineryIdEditRouteRoute =
+  AuthMachineriesMachineryIdEditRouteImport.update({
     path: '/machineries/$machineryId/edit',
-    getParentRoute: () => AuthRoute,
-  } as any)
+    getParentRoute: () => AuthRouteRoute,
+  } as any).lazy(() =>
+    import('./routes/_auth/machineries/$machineryId.edit/route.lazy').then(
+      (d) => d.Route,
+    ),
+  )
 
-const AuthResearchResearchIdExperimentsAddRoute =
-  AuthResearchResearchIdExperimentsAddImport.update({
-    path: '/experiments/add',
-    getParentRoute: () => AuthResearchResearchIdRoute,
-  } as any)
-
-const AuthResearchResearchIdExperimentsExperimentIdRoute =
-  AuthResearchResearchIdExperimentsExperimentIdImport.update({
-    path: '/experiments/$experimentId',
-    getParentRoute: () => AuthResearchResearchIdRoute,
-  } as any)
-
-const AuthResearchResearchIdExperimentsExperimentIdIndexRoute =
-  AuthResearchResearchIdExperimentsExperimentIdIndexImport.update({
+const AuthResearchResearchIdIndexRouteRoute =
+  AuthResearchResearchIdIndexRouteImport.update({
     path: '/',
-    getParentRoute: () => AuthResearchResearchIdExperimentsExperimentIdRoute,
-  } as any)
+    getParentRoute: () => AuthResearchResearchIdRouteRoute,
+  } as any).lazy(() =>
+    import('./routes/_auth/research/$researchId/index/route.lazy').then(
+      (d) => d.Route,
+    ),
+  )
 
-const AuthResearchResearchIdExperimentsExperimentIdEditRoute =
-  AuthResearchResearchIdExperimentsExperimentIdEditImport.update({
+const AuthResearchResearchIdExperimentsAddRouteRoute =
+  AuthResearchResearchIdExperimentsAddRouteImport.update({
+    path: '/experiments/add',
+    getParentRoute: () => AuthResearchResearchIdRouteRoute,
+  } as any).lazy(() =>
+    import(
+      './routes/_auth/research/$researchId/experiments/add/route.lazy'
+    ).then((d) => d.Route),
+  )
+
+const AuthResearchResearchIdExperimentsExperimentIdRouteRoute =
+  AuthResearchResearchIdExperimentsExperimentIdRouteImport.update({
+    path: '/experiments/$experimentId',
+    getParentRoute: () => AuthResearchResearchIdRouteRoute,
+  } as any).lazy(() =>
+    import(
+      './routes/_auth/research/$researchId/experiments/$experimentId/route.lazy'
+    ).then((d) => d.Route),
+  )
+
+const AuthResearchResearchIdExperimentsExperimentIdEditRouteRoute =
+  AuthResearchResearchIdExperimentsExperimentIdEditRouteImport.update({
     path: '/edit',
-    getParentRoute: () => AuthResearchResearchIdExperimentsExperimentIdRoute,
-  } as any)
+    getParentRoute: () =>
+      AuthResearchResearchIdExperimentsExperimentIdRouteRoute,
+  } as any).lazy(() =>
+    import(
+      './routes/_auth/research/$researchId/experiments/$experimentId/edit/route.lazy'
+    ).then((d) => d.Route),
+  )
+
+const AuthResearchResearchIdExperimentsExperimentIdIndexRouteRoute =
+  AuthResearchResearchIdExperimentsExperimentIdIndexRouteImport.update({
+    path: '/',
+    getParentRoute: () =>
+      AuthResearchResearchIdExperimentsExperimentIdRouteRoute,
+  } as any).lazy(() =>
+    import(
+      './routes/_auth/research/$researchId/experiments/$experimentId/index/route.lazy'
+    ).then((d) => d.Route),
+  )
 
 // Populate the FileRoutesByPath interface
 
@@ -191,169 +246,169 @@ declare module '@tanstack/react-router' {
       id: '/_auth'
       path: ''
       fullPath: ''
-      preLoaderRoute: typeof AuthImport
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRoute
     }
     '/_guest': {
       id: '/_guest'
       path: ''
       fullPath: ''
-      preLoaderRoute: typeof GuestImport
+      preLoaderRoute: typeof GuestRouteImport
       parentRoute: typeof rootRoute
     }
     '/_auth/users': {
       id: '/_auth/users'
       path: '/users'
       fullPath: '/users'
-      preLoaderRoute: typeof AuthUsersImport
-      parentRoute: typeof AuthImport
+      preLoaderRoute: typeof AuthUsersRouteImport
+      parentRoute: typeof AuthRouteImport
     }
     '/_guest/reset-password': {
       id: '/_guest/reset-password'
       path: '/reset-password'
       fullPath: '/reset-password'
-      preLoaderRoute: typeof GuestResetPasswordImport
-      parentRoute: typeof GuestImport
+      preLoaderRoute: typeof GuestResetPasswordRouteImport
+      parentRoute: typeof GuestRouteImport
     }
     '/_guest/forgot-password': {
       id: '/_guest/forgot-password'
       path: '/forgot-password'
       fullPath: '/forgot-password'
       preLoaderRoute: typeof GuestForgotPasswordLazyImport
-      parentRoute: typeof GuestImport
+      parentRoute: typeof GuestRouteImport
     }
     '/_guest/login': {
       id: '/_guest/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof GuestLoginLazyImport
-      parentRoute: typeof GuestImport
+      parentRoute: typeof GuestRouteImport
     }
     '/_auth/': {
       id: '/_auth/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthIndexLazyImport
-      parentRoute: typeof AuthImport
+      parentRoute: typeof AuthRouteImport
+    }
+    '/_auth/machineries/': {
+      id: '/_auth/machineries/'
+      path: '/machineries'
+      fullPath: '/machineries'
+      preLoaderRoute: typeof AuthMachineriesIndexRouteImport
+      parentRoute: typeof AuthRouteImport
+    }
+    '/_auth/machinery-parameters/': {
+      id: '/_auth/machinery-parameters/'
+      path: '/machinery-parameters'
+      fullPath: '/machinery-parameters'
+      preLoaderRoute: typeof AuthMachineryParametersIndexRouteImport
+      parentRoute: typeof AuthRouteImport
+    }
+    '/_auth/research/': {
+      id: '/_auth/research/'
+      path: '/research'
+      fullPath: '/research'
+      preLoaderRoute: typeof AuthResearchIndexRouteImport
+      parentRoute: typeof AuthRouteImport
+    }
+    '/_auth/users/': {
+      id: '/_auth/users/'
+      path: '/'
+      fullPath: '/users/'
+      preLoaderRoute: typeof AuthUsersIndexRouteImport
+      parentRoute: typeof AuthUsersRouteImport
     }
     '/_auth/machinery-parameters/add': {
       id: '/_auth/machinery-parameters/add'
       path: '/machinery-parameters/add'
       fullPath: '/machinery-parameters/add'
-      preLoaderRoute: typeof AuthMachineryParametersAddImport
-      parentRoute: typeof AuthImport
+      preLoaderRoute: typeof AuthMachineryParametersAddRouteImport
+      parentRoute: typeof AuthRouteImport
     }
     '/_auth/research/$researchId': {
       id: '/_auth/research/$researchId'
       path: '/research/$researchId'
       fullPath: '/research/$researchId'
-      preLoaderRoute: typeof AuthResearchResearchIdImport
-      parentRoute: typeof AuthImport
+      preLoaderRoute: typeof AuthResearchResearchIdRouteImport
+      parentRoute: typeof AuthRouteImport
     }
     '/_auth/research/add': {
       id: '/_auth/research/add'
       path: '/research/add'
       fullPath: '/research/add'
-      preLoaderRoute: typeof AuthResearchAddImport
-      parentRoute: typeof AuthImport
+      preLoaderRoute: typeof AuthResearchAddRouteImport
+      parentRoute: typeof AuthRouteImport
     }
     '/_auth/machineries/add': {
       id: '/_auth/machineries/add'
       path: '/machineries/add'
       fullPath: '/machineries/add'
       preLoaderRoute: typeof AuthMachineriesAddLazyImport
-      parentRoute: typeof AuthImport
+      parentRoute: typeof AuthRouteImport
     }
     '/_auth/users/add': {
       id: '/_auth/users/add'
       path: '/add'
       fullPath: '/users/add'
       preLoaderRoute: typeof AuthUsersAddLazyImport
-      parentRoute: typeof AuthUsersImport
-    }
-    '/_auth/machineries/': {
-      id: '/_auth/machineries/'
-      path: '/machineries'
-      fullPath: '/machineries'
-      preLoaderRoute: typeof AuthMachineriesIndexImport
-      parentRoute: typeof AuthImport
-    }
-    '/_auth/machinery-parameters/': {
-      id: '/_auth/machinery-parameters/'
-      path: '/machinery-parameters'
-      fullPath: '/machinery-parameters'
-      preLoaderRoute: typeof AuthMachineryParametersIndexImport
-      parentRoute: typeof AuthImport
-    }
-    '/_auth/research/': {
-      id: '/_auth/research/'
-      path: '/research'
-      fullPath: '/research'
-      preLoaderRoute: typeof AuthResearchIndexImport
-      parentRoute: typeof AuthImport
-    }
-    '/_auth/users/': {
-      id: '/_auth/users/'
-      path: '/'
-      fullPath: '/users/'
-      preLoaderRoute: typeof AuthUsersIndexImport
-      parentRoute: typeof AuthUsersImport
-    }
-    '/_auth/machineries/$machineryId/edit': {
-      id: '/_auth/machineries/$machineryId/edit'
-      path: '/machineries/$machineryId/edit'
-      fullPath: '/machineries/$machineryId/edit'
-      preLoaderRoute: typeof AuthMachineriesMachineryIdEditImport
-      parentRoute: typeof AuthImport
-    }
-    '/_auth/machinery-parameters/$machineryParameterId/edit': {
-      id: '/_auth/machinery-parameters/$machineryParameterId/edit'
-      path: '/machinery-parameters/$machineryParameterId/edit'
-      fullPath: '/machinery-parameters/$machineryParameterId/edit'
-      preLoaderRoute: typeof AuthMachineryParametersMachineryParameterIdEditImport
-      parentRoute: typeof AuthImport
-    }
-    '/_auth/research/$researchId/edit': {
-      id: '/_auth/research/$researchId/edit'
-      path: '/edit'
-      fullPath: '/research/$researchId/edit'
-      preLoaderRoute: typeof AuthResearchResearchIdEditImport
-      parentRoute: typeof AuthResearchResearchIdImport
+      parentRoute: typeof AuthUsersRouteImport
     }
     '/_auth/research/$researchId/': {
       id: '/_auth/research/$researchId/'
       path: '/'
       fullPath: '/research/$researchId/'
-      preLoaderRoute: typeof AuthResearchResearchIdIndexImport
-      parentRoute: typeof AuthResearchResearchIdImport
+      preLoaderRoute: typeof AuthResearchResearchIdIndexRouteImport
+      parentRoute: typeof AuthResearchResearchIdRouteImport
+    }
+    '/_auth/machineries/$machineryId/edit': {
+      id: '/_auth/machineries/$machineryId/edit'
+      path: '/machineries/$machineryId/edit'
+      fullPath: '/machineries/$machineryId/edit'
+      preLoaderRoute: typeof AuthMachineriesMachineryIdEditRouteImport
+      parentRoute: typeof AuthRouteImport
+    }
+    '/_auth/machinery-parameters/$machineryParameterId/edit': {
+      id: '/_auth/machinery-parameters/$machineryParameterId/edit'
+      path: '/machinery-parameters/$machineryParameterId/edit'
+      fullPath: '/machinery-parameters/$machineryParameterId/edit'
+      preLoaderRoute: typeof AuthMachineryParametersMachineryParameterIdEditRouteImport
+      parentRoute: typeof AuthRouteImport
+    }
+    '/_auth/research/$researchId/edit': {
+      id: '/_auth/research/$researchId/edit'
+      path: '/edit'
+      fullPath: '/research/$researchId/edit'
+      preLoaderRoute: typeof AuthResearchResearchIdEditRouteImport
+      parentRoute: typeof AuthResearchResearchIdRouteImport
     }
     '/_auth/research/$researchId/experiments/$experimentId': {
       id: '/_auth/research/$researchId/experiments/$experimentId'
       path: '/experiments/$experimentId'
       fullPath: '/research/$researchId/experiments/$experimentId'
-      preLoaderRoute: typeof AuthResearchResearchIdExperimentsExperimentIdImport
-      parentRoute: typeof AuthResearchResearchIdImport
+      preLoaderRoute: typeof AuthResearchResearchIdExperimentsExperimentIdRouteImport
+      parentRoute: typeof AuthResearchResearchIdRouteImport
     }
     '/_auth/research/$researchId/experiments/add': {
       id: '/_auth/research/$researchId/experiments/add'
       path: '/experiments/add'
       fullPath: '/research/$researchId/experiments/add'
-      preLoaderRoute: typeof AuthResearchResearchIdExperimentsAddImport
-      parentRoute: typeof AuthResearchResearchIdImport
-    }
-    '/_auth/research/$researchId/experiments/$experimentId/edit': {
-      id: '/_auth/research/$researchId/experiments/$experimentId/edit'
-      path: '/edit'
-      fullPath: '/research/$researchId/experiments/$experimentId/edit'
-      preLoaderRoute: typeof AuthResearchResearchIdExperimentsExperimentIdEditImport
-      parentRoute: typeof AuthResearchResearchIdExperimentsExperimentIdImport
+      preLoaderRoute: typeof AuthResearchResearchIdExperimentsAddRouteImport
+      parentRoute: typeof AuthResearchResearchIdRouteImport
     }
     '/_auth/research/$researchId/experiments/$experimentId/': {
       id: '/_auth/research/$researchId/experiments/$experimentId/'
       path: '/'
       fullPath: '/research/$researchId/experiments/$experimentId/'
-      preLoaderRoute: typeof AuthResearchResearchIdExperimentsExperimentIdIndexImport
-      parentRoute: typeof AuthResearchResearchIdExperimentsExperimentIdImport
+      preLoaderRoute: typeof AuthResearchResearchIdExperimentsExperimentIdIndexRouteImport
+      parentRoute: typeof AuthResearchResearchIdExperimentsExperimentIdRouteImport
+    }
+    '/_auth/research/$researchId/experiments/$experimentId/edit': {
+      id: '/_auth/research/$researchId/experiments/$experimentId/edit'
+      path: '/edit'
+      fullPath: '/research/$researchId/experiments/$experimentId/edit'
+      preLoaderRoute: typeof AuthResearchResearchIdExperimentsExperimentIdEditRouteImport
+      parentRoute: typeof AuthResearchResearchIdExperimentsExperimentIdRouteImport
     }
   }
 }
@@ -361,33 +416,34 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 export const routeTree = rootRoute.addChildren({
-  AuthRoute: AuthRoute.addChildren({
-    AuthUsersRoute: AuthUsersRoute.addChildren({
+  AuthRouteRoute: AuthRouteRoute.addChildren({
+    AuthUsersRouteRoute: AuthUsersRouteRoute.addChildren({
+      AuthUsersIndexRouteRoute,
       AuthUsersAddLazyRoute,
-      AuthUsersIndexRoute,
     }),
     AuthIndexLazyRoute,
-    AuthMachineryParametersAddRoute,
-    AuthResearchResearchIdRoute: AuthResearchResearchIdRoute.addChildren({
-      AuthResearchResearchIdEditRoute,
-      AuthResearchResearchIdIndexRoute,
-      AuthResearchResearchIdExperimentsExperimentIdRoute:
-        AuthResearchResearchIdExperimentsExperimentIdRoute.addChildren({
-          AuthResearchResearchIdExperimentsExperimentIdEditRoute,
-          AuthResearchResearchIdExperimentsExperimentIdIndexRoute,
-        }),
-      AuthResearchResearchIdExperimentsAddRoute,
-    }),
-    AuthResearchAddRoute,
+    AuthMachineriesIndexRouteRoute,
+    AuthMachineryParametersIndexRouteRoute,
+    AuthResearchIndexRouteRoute,
+    AuthMachineryParametersAddRouteRoute,
+    AuthResearchResearchIdRouteRoute:
+      AuthResearchResearchIdRouteRoute.addChildren({
+        AuthResearchResearchIdIndexRouteRoute,
+        AuthResearchResearchIdEditRouteRoute,
+        AuthResearchResearchIdExperimentsExperimentIdRouteRoute:
+          AuthResearchResearchIdExperimentsExperimentIdRouteRoute.addChildren({
+            AuthResearchResearchIdExperimentsExperimentIdIndexRouteRoute,
+            AuthResearchResearchIdExperimentsExperimentIdEditRouteRoute,
+          }),
+        AuthResearchResearchIdExperimentsAddRouteRoute,
+      }),
+    AuthResearchAddRouteRoute,
     AuthMachineriesAddLazyRoute,
-    AuthMachineriesIndexRoute,
-    AuthMachineryParametersIndexRoute,
-    AuthResearchIndexRoute,
-    AuthMachineriesMachineryIdEditRoute,
-    AuthMachineryParametersMachineryParameterIdEditRoute,
+    AuthMachineriesMachineryIdEditRouteRoute,
+    AuthMachineryParametersMachineryParameterIdEditRouteRoute,
   }),
-  GuestRoute: GuestRoute.addChildren({
-    GuestResetPasswordRoute,
+  GuestRouteRoute: GuestRouteRoute.addChildren({
+    GuestResetPasswordRouteRoute,
     GuestForgotPasswordLazyRoute,
     GuestLoginLazyRoute,
   }),
@@ -406,23 +462,23 @@ export const routeTree = rootRoute.addChildren({
       ]
     },
     "/_auth": {
-      "filePath": "_auth.tsx",
+      "filePath": "_auth/route.tsx",
       "children": [
         "/_auth/users",
         "/_auth/",
+        "/_auth/machineries/",
+        "/_auth/machinery-parameters/",
+        "/_auth/research/",
         "/_auth/machinery-parameters/add",
         "/_auth/research/$researchId",
         "/_auth/research/add",
         "/_auth/machineries/add",
-        "/_auth/machineries/",
-        "/_auth/machinery-parameters/",
-        "/_auth/research/",
         "/_auth/machineries/$machineryId/edit",
         "/_auth/machinery-parameters/$machineryParameterId/edit"
       ]
     },
     "/_guest": {
-      "filePath": "_guest.tsx",
+      "filePath": "_guest/route.tsx",
       "children": [
         "/_guest/reset-password",
         "/_guest/forgot-password",
@@ -430,15 +486,15 @@ export const routeTree = rootRoute.addChildren({
       ]
     },
     "/_auth/users": {
-      "filePath": "_auth/users.tsx",
+      "filePath": "_auth/users/route.tsx",
       "parent": "/_auth",
       "children": [
-        "/_auth/users/add",
-        "/_auth/users/"
+        "/_auth/users/",
+        "/_auth/users/add"
       ]
     },
     "/_guest/reset-password": {
-      "filePath": "_guest/reset-password.tsx",
+      "filePath": "_guest/reset-password/route.tsx",
       "parent": "/_guest"
     },
     "/_guest/forgot-password": {
@@ -453,22 +509,38 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "_auth/index.lazy.tsx",
       "parent": "/_auth"
     },
+    "/_auth/machineries/": {
+      "filePath": "_auth/machineries/index/route.tsx",
+      "parent": "/_auth"
+    },
+    "/_auth/machinery-parameters/": {
+      "filePath": "_auth/machinery-parameters/index/route.tsx",
+      "parent": "/_auth"
+    },
+    "/_auth/research/": {
+      "filePath": "_auth/research/index/route.tsx",
+      "parent": "/_auth"
+    },
+    "/_auth/users/": {
+      "filePath": "_auth/users/index/route.tsx",
+      "parent": "/_auth/users"
+    },
     "/_auth/machinery-parameters/add": {
-      "filePath": "_auth/machinery-parameters/add.tsx",
+      "filePath": "_auth/machinery-parameters/add/route.tsx",
       "parent": "/_auth"
     },
     "/_auth/research/$researchId": {
-      "filePath": "_auth/research/$researchId.tsx",
+      "filePath": "_auth/research/$researchId/route.tsx",
       "parent": "/_auth",
       "children": [
-        "/_auth/research/$researchId/edit",
         "/_auth/research/$researchId/",
+        "/_auth/research/$researchId/edit",
         "/_auth/research/$researchId/experiments/$experimentId",
         "/_auth/research/$researchId/experiments/add"
       ]
     },
     "/_auth/research/add": {
-      "filePath": "_auth/research/add.tsx",
+      "filePath": "_auth/research/add/route.tsx",
       "parent": "/_auth"
     },
     "/_auth/machineries/add": {
@@ -479,56 +551,40 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "_auth/users/add.lazy.tsx",
       "parent": "/_auth/users"
     },
-    "/_auth/machineries/": {
-      "filePath": "_auth/machineries/index.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/machinery-parameters/": {
-      "filePath": "_auth/machinery-parameters/index.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/research/": {
-      "filePath": "_auth/research/index.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/users/": {
-      "filePath": "_auth/users/index.tsx",
-      "parent": "/_auth/users"
+    "/_auth/research/$researchId/": {
+      "filePath": "_auth/research/$researchId/index/route.tsx",
+      "parent": "/_auth/research/$researchId"
     },
     "/_auth/machineries/$machineryId/edit": {
-      "filePath": "_auth/machineries/$machineryId.edit.tsx",
+      "filePath": "_auth/machineries/$machineryId.edit/route.tsx",
       "parent": "/_auth"
     },
     "/_auth/machinery-parameters/$machineryParameterId/edit": {
-      "filePath": "_auth/machinery-parameters/$machineryParameterId.edit.tsx",
+      "filePath": "_auth/machinery-parameters/$machineryParameterId.edit/route.tsx",
       "parent": "/_auth"
     },
     "/_auth/research/$researchId/edit": {
-      "filePath": "_auth/research/$researchId/edit.tsx",
-      "parent": "/_auth/research/$researchId"
-    },
-    "/_auth/research/$researchId/": {
-      "filePath": "_auth/research/$researchId/index.tsx",
+      "filePath": "_auth/research/$researchId/edit/route.tsx",
       "parent": "/_auth/research/$researchId"
     },
     "/_auth/research/$researchId/experiments/$experimentId": {
-      "filePath": "_auth/research/$researchId/experiments/$experimentId.tsx",
+      "filePath": "_auth/research/$researchId/experiments/$experimentId/route.tsx",
       "parent": "/_auth/research/$researchId",
       "children": [
-        "/_auth/research/$researchId/experiments/$experimentId/edit",
-        "/_auth/research/$researchId/experiments/$experimentId/"
+        "/_auth/research/$researchId/experiments/$experimentId/",
+        "/_auth/research/$researchId/experiments/$experimentId/edit"
       ]
     },
     "/_auth/research/$researchId/experiments/add": {
-      "filePath": "_auth/research/$researchId/experiments/add.tsx",
+      "filePath": "_auth/research/$researchId/experiments/add/route.tsx",
       "parent": "/_auth/research/$researchId"
     },
-    "/_auth/research/$researchId/experiments/$experimentId/edit": {
-      "filePath": "_auth/research/$researchId/experiments/$experimentId/edit.tsx",
+    "/_auth/research/$researchId/experiments/$experimentId/": {
+      "filePath": "_auth/research/$researchId/experiments/$experimentId/index/route.tsx",
       "parent": "/_auth/research/$researchId/experiments/$experimentId"
     },
-    "/_auth/research/$researchId/experiments/$experimentId/": {
-      "filePath": "_auth/research/$researchId/experiments/$experimentId/index.tsx",
+    "/_auth/research/$researchId/experiments/$experimentId/edit": {
+      "filePath": "_auth/research/$researchId/experiments/$experimentId/edit/route.tsx",
       "parent": "/_auth/research/$researchId/experiments/$experimentId"
     }
   }

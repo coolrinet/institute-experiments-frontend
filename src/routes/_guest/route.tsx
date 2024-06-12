@@ -1,5 +1,4 @@
-import { AppShell } from '@mantine/core';
-import { Outlet, createFileRoute, redirect } from '@tanstack/react-router';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 import { z } from 'zod';
 
 const fallbackRedirect = '/' as const;
@@ -15,15 +14,4 @@ export const Route = createFileRoute('/_guest')({
       }
     }
   },
-  component: GuestLayout,
 });
-
-function GuestLayout() {
-  return (
-    <AppShell padding='md'>
-      <AppShell.Main>
-        <Outlet />
-      </AppShell.Main>
-    </AppShell>
-  );
-}

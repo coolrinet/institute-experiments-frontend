@@ -6,6 +6,7 @@ import { useMutation } from '@tanstack/react-query';
 import { createLazyFileRoute, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
+import PageLoader from '~/components/Loader';
 
 import { useAuth } from '~/hooks/use-auth';
 
@@ -14,6 +15,7 @@ import { ForgotPasswordData, forgotPasswordSchema } from '~/types/schema';
 
 export const Route = createLazyFileRoute('/_guest/forgot-password')({
   component: ForgotPasswordPage,
+  pendingComponent: PageLoader,
 });
 
 function ForgotPasswordPage() {

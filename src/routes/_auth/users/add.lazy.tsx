@@ -8,11 +8,14 @@ import axios from 'axios';
 import { useForm } from 'react-hook-form';
 import { addUser } from '~/api/users/add-user';
 
+import PageLoader from '~/components/Loader';
+
 import { ApiErrorResponse } from '~/types/api';
 import { AddUserData, addUserSchema } from '~/types/schema';
 
 export const Route = createLazyFileRoute('/_auth/users/add')({
   component: AddNewUserPage,
+  pendingComponent: PageLoader,
 });
 
 function AddNewUserPage() {

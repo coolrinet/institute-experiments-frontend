@@ -13,7 +13,7 @@ import {
 import { notifications } from '@mantine/notifications';
 import { IconCheck, IconX } from '@tabler/icons-react';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, useRouter } from '@tanstack/react-router';
+import { createLazyFileRoute, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
 import { editMachinery } from '~/api/machineries/edit-machinery';
@@ -24,10 +24,7 @@ import PageLoader from '~/components/Loader';
 import { ApiErrorResponse } from '~/types/api';
 import { MachineryData, machinerySchema } from '~/types/schema';
 
-export const Route = createFileRoute('/_auth/machineries/$machineryId/edit')({
-  parseParams: ({ machineryId }) => ({ machineryId: Number(machineryId) }),
-  loader: ({ context, params }) =>
-    context.queryClient.ensureQueryData(getMachineryQueryOptions(params.machineryId)),
+export const Route = createLazyFileRoute('/_auth/machineries/$machineryId/edit')({
   component: EditMachineryPage,
   pendingComponent: PageLoader,
 });

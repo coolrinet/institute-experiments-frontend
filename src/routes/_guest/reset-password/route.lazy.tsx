@@ -3,27 +3,20 @@ import { Button, Card, Center, PasswordInput, Stack, Title } from '@mantine/core
 import { notifications } from '@mantine/notifications';
 import { IconCheck, IconLock, IconX } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
-import { createFileRoute, redirect, useRouter } from '@tanstack/react-router';
+import { createLazyFileRoute, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+
+import PageLoader from '~/components/Loader';
 
 import { useAuth } from '~/hooks/use-auth';
 
 import { ApiErrorResponse } from '~/types/api';
 import { ResetPasswordData, ResetPasswordInput, resetPasswordSchema } from '~/types/schema';
 
-export const Route = createFileRoute('/_guest/reset-password')({
-  validateSearch: z.object({
-    token: z.string().catch(''),
-    email: z.string().email().catch(''),
-  }),
-  beforeLoad: ({ search }) => {
-    if (!(search.email || search.token)) {
-      throw redirect({ to: '/login' });
-    }
-  },
+export const Route = createLazyFileRoute('/_guest/reset-password')({
   component: ResetPasswordPage,
+  pendingComponent: PageLoader,
 });
 
 function ResetPasswordPage() {

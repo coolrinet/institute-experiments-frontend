@@ -18,6 +18,8 @@ import { Link, createLazyFileRoute, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
 
+import PageLoader from '~/components/Loader';
+
 import { useAuth } from '~/hooks/use-auth';
 
 import { ApiErrorResponse } from '~/types/api';
@@ -25,6 +27,7 @@ import { LoginData, loginSchema } from '~/types/schema';
 
 export const Route = createLazyFileRoute('/_guest/login')({
   component: LoginPage,
+  pendingComponent: PageLoader,
 });
 
 const fallbackRedirect = '/' as const;

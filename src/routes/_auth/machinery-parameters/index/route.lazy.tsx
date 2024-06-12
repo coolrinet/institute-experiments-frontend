@@ -17,9 +17,8 @@ import { useDebouncedCallback } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { IconCheck, IconEdit, IconSearch, IconTrash, IconX } from '@tabler/icons-react';
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { Link, createFileRoute, useRouter } from '@tanstack/react-router';
+import { Link, createLazyFileRoute, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
-import { z } from 'zod';
 import { deleteMachineryParameter } from '~/api/machinery-parameters/delete-machinery-parameter';
 import { getMachineryParametersQueryOptions } from '~/api/machinery-parameters/get-machinery-parameters';
 import { PARAMETER_TYPE_ITEMS, VALUE_TYPE_ITEMS } from '~/utils/consts';
@@ -31,16 +30,7 @@ import { useAuth } from '~/hooks/use-auth';
 
 import { ApiErrorResponse } from '~/types/api';
 
-export const Route = createFileRoute('/_auth/machinery-parameters/')({
-  validateSearch: z.object({
-    page: z.number().optional().default(1),
-    name: z.string().optional().catch(''),
-    parameterType: z.enum(['input', 'output']).optional(),
-    valueType: z.enum(['quantitative', 'quality']).optional(),
-  }),
-  loaderDeps: ({ search }) => search,
-  loader: ({ context, deps }) =>
-    context.queryClient.ensureQueryData(getMachineryParametersQueryOptions(deps)),
+export const Route = createLazyFileRoute('/_auth/machinery-parameters/')({
   component: MachineryParametersPage,
   pendingComponent: PageLoader,
 });

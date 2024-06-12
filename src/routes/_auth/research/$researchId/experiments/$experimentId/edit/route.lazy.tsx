@@ -15,7 +15,7 @@ import { DatePickerInput } from '@mantine/dates';
 import { notifications } from '@mantine/notifications';
 import { IconCheck, IconX } from '@tabler/icons-react';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, useRouter } from '@tanstack/react-router';
+import { createLazyFileRoute, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { useState } from 'react';
@@ -28,13 +28,10 @@ import PageLoader from '~/components/Loader';
 import { ApiErrorResponse } from '~/types/api';
 import { ExperimentData, experimentSchema } from '~/types/schema';
 
-export const Route = createFileRoute('/_auth/research/$researchId/experiments/$experimentId/edit')({
+export const Route = createLazyFileRoute(
+  '/_auth/research/$researchId/experiments/$experimentId/edit'
+)({
   component: EditExperimentPage,
-  loader: ({ context, params }) => {
-    context.queryClient.ensureQueryData(
-      getExperimentQueryOptions(params.researchId, params.experimentId)
-    );
-  },
   pendingComponent: PageLoader,
 });
 

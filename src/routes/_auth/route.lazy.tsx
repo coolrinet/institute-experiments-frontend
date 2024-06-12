@@ -11,27 +11,18 @@ import {
   IconX,
 } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
-import { Link, Outlet, createFileRoute, redirect, useRouter } from '@tanstack/react-router';
+import { Link, Outlet, createLazyFileRoute, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
+
+import PageLoader from '~/components/Loader';
 
 import { useAuth } from '~/hooks/use-auth';
 
 import { ApiErrorResponse } from '~/types/api';
 
-export const Route = createFileRoute('/_auth')({
-  beforeLoad: ({ context, location }) => {
-    if (!context.auth.isUserLoading) {
-      if (!context.auth.isAuthenticated) {
-        throw redirect({
-          to: '/login',
-          search: {
-            redirect: location.href,
-          },
-        });
-      }
-    }
-  },
+export const Route = createLazyFileRoute('/_auth')({
   component: AuthLayout,
+  pendingComponent: PageLoader,
 });
 
 function AuthLayout() {

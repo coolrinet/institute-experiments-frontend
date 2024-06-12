@@ -18,7 +18,7 @@ import {
 import { notifications } from '@mantine/notifications';
 import { IconAlertCircle, IconCheck, IconX } from '@tabler/icons-react';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, useRouter } from '@tanstack/react-router';
+import { createLazyFileRoute, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
 import { Controller, useForm } from 'react-hook-form';
 import { getMachineriesQueryOptions } from '~/api/machineries/get-machineries';
@@ -27,18 +27,16 @@ import { getResearchQueryOptions } from '~/api/research/get-research';
 import { getUsersQueryOptions } from '~/api/users/get-users';
 import { getUserFullName } from '~/utils/get-user-full-name';
 
+import PageLoader from '~/components/Loader';
+
 import { useAuth } from '~/hooks/use-auth';
 
 import { ApiErrorResponse } from '~/types/api';
 import { ResearchData, researchSchema } from '~/types/schema';
 
-export const Route = createFileRoute('/_auth/research/$researchId/edit')({
-  loader: ({ context, params }) => {
-    context.queryClient.ensureQueryData(getResearchQueryOptions(params.researchId));
-    context.queryClient.ensureQueryData(getMachineriesQueryOptions({}));
-    context.queryClient.ensureQueryData(getUsersQueryOptions({}));
-  },
+export const Route = createLazyFileRoute('/_auth/research/$researchId/edit')({
   component: EditResearchPage,
+  pendingComponent: PageLoader,
 });
 
 function EditResearchPage() {

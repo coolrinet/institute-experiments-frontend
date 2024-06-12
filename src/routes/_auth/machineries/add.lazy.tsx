@@ -8,11 +8,14 @@ import axios from 'axios';
 import { useForm } from 'react-hook-form';
 import { addMachinery } from '~/api/machineries/add-machinery';
 
+import PageLoader from '~/components/Loader';
+
 import { ApiErrorResponse } from '~/types/api';
 import { MachineryData, machinerySchema } from '~/types/schema';
 
 export const Route = createLazyFileRoute('/_auth/machineries/add')({
   component: AddMachineryPage,
+  pendingComponent: PageLoader,
 });
 
 function AddMachineryPage() {

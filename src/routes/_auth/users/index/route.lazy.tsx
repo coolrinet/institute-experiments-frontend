@@ -14,23 +14,20 @@ import {
 import { notifications } from '@mantine/notifications';
 import { IconCheck, IconTrash, IconX } from '@tabler/icons-react';
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { Link, createFileRoute, useRouter } from '@tanstack/react-router';
+import { Link, createLazyFileRoute, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
-import { z } from 'zod';
 import { deleteUser } from '~/api/users/delete-user';
 import { getUsersQueryOptions } from '~/api/users/get-users';
+
+import PageLoader from '~/components/Loader';
 
 import { useAuth } from '~/hooks/use-auth';
 
 import { ApiErrorResponse } from '~/types/api';
 
-export const Route = createFileRoute('/_auth/users/')({
-  validateSearch: z.object({
-    page: z.number().optional().default(1),
-  }),
-  loaderDeps: ({ search }) => search,
-  loader: ({ context, deps }) => context.queryClient.ensureQueryData(getUsersQueryOptions(deps)),
+export const Route = createLazyFileRoute('/_auth/users/')({
   component: UsersPage,
+  pendingComponent: PageLoader,
 });
 
 function UsersPage() {

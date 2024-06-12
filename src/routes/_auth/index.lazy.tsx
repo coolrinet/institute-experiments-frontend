@@ -2,8 +2,11 @@ import { Button, Group, Stack, Text, Title } from '@mantine/core';
 import { createLazyFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 
+import PageLoader from '~/components/Loader';
+
 export const Route = createLazyFileRoute('/_auth/')({
   component: IndexPage,
+  pendingComponent: PageLoader,
 });
 
 function IndexPage() {

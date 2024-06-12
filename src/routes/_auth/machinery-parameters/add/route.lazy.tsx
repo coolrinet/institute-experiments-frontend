@@ -3,7 +3,7 @@ import { Button, Card, Group, Select, Stack, TextInput, Title } from '@mantine/c
 import { notifications } from '@mantine/notifications';
 import { IconCheck, IconX } from '@tabler/icons-react';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, useRouter } from '@tanstack/react-router';
+import { createLazyFileRoute, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
 import { Controller, useForm } from 'react-hook-form';
 import { getMachineriesQueryOptions } from '~/api/machineries/get-machineries';
@@ -15,9 +15,8 @@ import PageLoader from '~/components/Loader';
 import { ApiErrorResponse } from '~/types/api';
 import { MachineryParameterData, machineryParameterSchema } from '~/types/schema';
 
-export const Route = createFileRoute('/_auth/machinery-parameters/add')({
+export const Route = createLazyFileRoute('/_auth/machinery-parameters/add')({
   component: AddMachineryParameterPage,
-  loader: ({ context }) => context.queryClient.ensureQueryData(getMachineriesQueryOptions({})),
   pendingComponent: PageLoader,
 });
 
