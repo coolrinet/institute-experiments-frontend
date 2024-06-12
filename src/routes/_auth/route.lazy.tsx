@@ -93,6 +93,7 @@ function AuthLayout() {
         breakpoint: 'sm',
         collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
       }}
+      zIndex={500}
     >
       <Box pos='relative'>
         <LoadingOverlay visible={isPending} />

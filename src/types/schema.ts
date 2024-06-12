@@ -34,7 +34,7 @@ export const addUserSchema = z.object({
     .string()
     .min(1, 'Данное поле является обязательным')
     .max(255, 'Длина данного поля не должна превышать 255 символов'),
-  middleName: z.string().max(255, 'Длина данного поля не должна превышать 255 символов').optional(),
+  middleName: z.string().max(255, 'Длина данного поля не должна превышать 255 символов').nullish(),
   email: z
     .string()
     .min(1, 'Данное поле является обязательным')
@@ -43,6 +43,22 @@ export const addUserSchema = z.object({
   isAdmin: z.boolean().default(false),
 });
 export type AddUserData = z.infer<typeof addUserSchema>;
+
+export const editProfileSchema = addUserSchema
+  .extend({
+    newPassword: z.string().min(8, 'Длина пароля должна быть не менее 8 символов').nullish(),
+    currentPassword: z.string().min(1, 'Введите текущий пароль для изменения данных'),
+    currentPasswordConfirmation: z.string().min(1, 'Данное поле является обязательным'),
+  })
+  .refine(
+    ({ currentPassword, currentPasswordConfirmation }) =>
+      currentPassword === currentPasswordConfirmation,
+    {
+      message: 'Пароли не совпадают',
+      path: ['newPassword', 'currentPasswordConfirmation'],
+    }
+  );
+export type EditProfileData = z.infer<typeof editProfileSchema>;
 
 export const machinerySchema = z.object({
   name: z
