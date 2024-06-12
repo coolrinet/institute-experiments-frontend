@@ -17,6 +17,11 @@ export type User = ApiResponseBase<{
   middleName: string | null;
   email: string;
   isAdmin?: boolean;
+  machineryCount?: number;
+  machineryParameterCount?: number;
+  experimentCount?: number;
+  researchCount?: number;
+  participatoryResearchCount?: number;
 }>;
 
 export type Users = ApiResponseBase<Array<User['data']>>;

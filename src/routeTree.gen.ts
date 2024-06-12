@@ -40,6 +40,7 @@ const GuestLoginLazyImport = createFileRoute('/_guest/login')()
 const GuestForgotPasswordLazyImport = createFileRoute(
   '/_guest/forgot-password',
 )()
+const AuthEditProfileLazyImport = createFileRoute('/_auth/edit-profile')()
 const AuthUsersAddLazyImport = createFileRoute('/_auth/users/add')()
 const AuthMachineriesAddLazyImport = createFileRoute('/_auth/machineries/add')()
 
@@ -70,6 +71,13 @@ const GuestForgotPasswordLazyRoute = GuestForgotPasswordLazyImport.update({
   getParentRoute: () => GuestRouteRoute,
 } as any).lazy(() =>
   import('./routes/_guest/forgot-password.lazy').then((d) => d.Route),
+)
+
+const AuthEditProfileLazyRoute = AuthEditProfileLazyImport.update({
+  path: '/edit-profile',
+  getParentRoute: () => AuthRouteRoute,
+} as any).lazy(() =>
+  import('./routes/_auth/edit-profile.lazy').then((d) => d.Route),
 )
 
 const GuestResetPasswordRouteRoute = GuestResetPasswordRouteImport.update({
@@ -270,6 +278,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GuestResetPasswordRouteImport
       parentRoute: typeof GuestRouteImport
     }
+    '/_auth/edit-profile': {
+      id: '/_auth/edit-profile'
+      path: '/edit-profile'
+      fullPath: '/edit-profile'
+      preLoaderRoute: typeof AuthEditProfileLazyImport
+      parentRoute: typeof AuthRouteImport
+    }
     '/_guest/forgot-password': {
       id: '/_guest/forgot-password'
       path: '/forgot-password'
@@ -421,6 +436,7 @@ export const routeTree = rootRoute.addChildren({
       AuthUsersIndexRouteRoute,
       AuthUsersAddLazyRoute,
     }),
+    AuthEditProfileLazyRoute,
     AuthIndexLazyRoute,
     AuthMachineriesIndexRouteRoute,
     AuthMachineryParametersIndexRouteRoute,
@@ -465,6 +481,7 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "_auth/route.tsx",
       "children": [
         "/_auth/users",
+        "/_auth/edit-profile",
         "/_auth/",
         "/_auth/machineries/",
         "/_auth/machinery-parameters/",
@@ -496,6 +513,10 @@ export const routeTree = rootRoute.addChildren({
     "/_guest/reset-password": {
       "filePath": "_guest/reset-password/route.tsx",
       "parent": "/_guest"
+    },
+    "/_auth/edit-profile": {
+      "filePath": "_auth/edit-profile.lazy.tsx",
+      "parent": "/_auth"
     },
     "/_guest/forgot-password": {
       "filePath": "_guest/forgot-password.lazy.tsx",

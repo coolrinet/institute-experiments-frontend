@@ -1,4 +1,4 @@
-import { MantineProvider } from '@mantine/core';
+import { MantineProvider, createTheme } from '@mantine/core';
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
 import '@mantine/notifications/styles.css';
@@ -24,9 +24,13 @@ function AppRouter() {
   return <RouterProvider router={router} context={{ auth }} />;
 }
 
+const theme = createTheme({
+  fontFamily: 'Open Sans, sans-serif',
+});
+
 function App() {
   return (
-    <MantineProvider>
+    <MantineProvider theme={theme}>
       <Suspense fallback={<PageLoader />}>
         <QueryClientProvider client={queryClient}>
           <AppRouter />

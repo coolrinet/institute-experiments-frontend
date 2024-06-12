@@ -4,9 +4,9 @@ import { notifications } from '@mantine/notifications';
 import {
   IconBuildingFactory,
   IconCheck,
-  IconHome,
   IconReportSearch,
   IconSettings,
+  IconUser,
   IconUsers,
   IconX,
 } from '@tabler/icons-react';
@@ -119,8 +119,8 @@ function AuthLayout() {
         </AppShell.Header>
         <AppShell.Navbar>
           <NavLink
-            leftSection={<IconHome size={16} />}
-            label='Главная'
+            leftSection={<IconUser size={16} />}
+            label='Профиль'
             renderRoot={props => <Link to='/' {...props} />}
           />
           <NavLink
