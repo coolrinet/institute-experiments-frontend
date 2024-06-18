@@ -238,6 +238,7 @@ function AddExperimentPage() {
                           description='Количественный параметр'
                           placeholder='Введите значение параметра'
                           hideControls
+                          decimalSeparator=','
                           error={formState.errors.quantitativeInputs?.[index]?.value?.message}
                         />
                       )}
@@ -279,6 +280,7 @@ function AddExperimentPage() {
                           description='Количественный параметр'
                           placeholder='Введите значение параметра'
                           hideControls
+                          decimalSeparator=','
                           error={formState.errors.quantitativeOutputs?.[index]?.value?.message}
                         />
                       )}

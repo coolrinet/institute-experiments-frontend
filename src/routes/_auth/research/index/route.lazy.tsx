@@ -102,7 +102,7 @@ function ResearchPage() {
     try {
       await deleteResearch(researchId);
 
-      await queryClient.invalidateQueries({ queryKey: ['research'] });
+      await queryClient.invalidateQueries({ queryKey: ['research-list'] });
 
       await router.invalidate();
 

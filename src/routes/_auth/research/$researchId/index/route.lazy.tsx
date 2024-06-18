@@ -162,7 +162,7 @@ function ShowResearchPage() {
           <ActionIcon color='teal' onClick={() => handleShow(experiment.id)}>
             <IconEye size={16} />
           </ActionIcon>
-          {!research.data.isPublic && experiment.user.id === user?.data.id && (
+          {experiment.user.id === user?.data.id && (
             <>
               <ActionIcon onClick={() => handleEdit(experiment.id)}>
                 <IconEdit size={16} />
@@ -249,7 +249,12 @@ function ShowResearchPage() {
                 color='teal'
                 leftSection={<IconFileExport size={16} />}
                 renderRoot={props => (
-                  <CSVLink {...props} data={exportData} headers={exportHeaders} />
+                  <CSVLink
+                    {...props}
+                    data={exportData}
+                    headers={exportHeaders}
+                    filename={`${research.data.name}.csv`}
+                  />
                 )}
               >
                 Экспортировать в CSV
@@ -283,7 +288,7 @@ function ShowResearchPage() {
                   onChange={onExperimentsPageChange}
                 />
               )}
-              {!research.data.isPublic && (
+              {(!research.data.isPublic || user?.data.id === research.data.author.id) && (
                 <Button
                   renderRoot={props => (
                     <Link
