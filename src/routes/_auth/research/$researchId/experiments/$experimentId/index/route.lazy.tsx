@@ -31,8 +31,8 @@ function ExperimentPage() {
   );
 
   const experimentInputsTableRows = [
-    ...experiment.data.qualityInputs,
-    ...experiment.data.quantitativeInputs,
+    ...(experiment.data.qualityInputs || []),
+    ...(experiment.data.quantitativeInputs || []),
   ].map(input => (
     <Table.Tr key={input.parameterId}>
       <Table.Td>{input.name}</Table.Td>
@@ -40,8 +40,8 @@ function ExperimentPage() {
     </Table.Tr>
   ));
   const experimentOutputsTableRows = [
-    ...experiment.data.qualityOutputs,
-    ...experiment.data.quantitativeOutputs,
+    ...(experiment.data.qualityOutputs || []),
+    ...(experiment.data.quantitativeOutputs || []),
   ].map(output => (
     <Table.Tr key={output.parameterId}>
       <Table.Td>{output.name}</Table.Td>
