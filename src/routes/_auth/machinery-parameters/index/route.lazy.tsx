@@ -15,20 +15,15 @@ import {
 } from '@mantine/core';
 import { useDebouncedCallback } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { IconCheck, IconEdit, IconSearch, IconTrash, IconX } from '@tabler/icons-react';
-import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { Link, createLazyFileRoute, useRouter } from '@tanstack/react-router';
-import axios from 'axios';
-import { deleteMachineryParameter } from '~/api/machinery-parameters/delete-machinery-parameter';
-import { getMachineryParametersQueryOptions } from '~/api/machinery-parameters/get-machinery-parameters';
+import { IconEdit, IconSearch, IconTrash, IconX } from '@tabler/icons-react';
+import { Link, createLazyFileRoute } from '@tanstack/react-router';
 import { PARAMETER_TYPE_ITEMS, VALUE_TYPE_ITEMS } from '~/utils/consts';
 import { getUserFullName } from '~/utils/get-user-full-name';
 
 import PageLoader from '~/components/Loader';
 
 import { useAuth } from '~/hooks/use-auth';
-
-import { ApiErrorResponse } from '~/types/api';
+import useMachineryParameters from '~/hooks/use-machinery-parameters';
 
 export const Route = createLazyFileRoute('/_auth/machinery-parameters/')({
   component: MachineryParametersPage,
@@ -38,13 +33,13 @@ export const Route = createLazyFileRoute('/_auth/machinery-parameters/')({
 function MachineryParametersPage() {
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
-  const router = useRouter();
 
-  const queryClient = useQueryClient();
-
-  const { data: machineryParameters, isFetching } = useSuspenseQuery(
-    getMachineryParametersQueryOptions(search)
-  );
+  const {
+    machineryParameters,
+    deleteMachineryParameter,
+    isMachineryParameterDeleting,
+    isMachineryParametersFetching,
+  } = useMachineryParameters(search);
 
   const { user } = useAuth();
 
@@ -69,7 +64,7 @@ function MachineryParametersPage() {
     await onParamChange('name', name);
   }, 200);
 
-  const handleDelete = async (machineryParameterId: number) => {
+  const handleDelete = (machineryParameterId: number) => {
     const machineryParameter = machineryParameters.data.find(
       machineryParameter => machineryParameter.id === machineryParameterId
     );
@@ -90,49 +85,7 @@ function MachineryParametersPage() {
       return;
     }
 
-    try {
-      await deleteMachineryParameter(machineryParameterId);
-
-      await queryClient.invalidateQueries({ queryKey: ['machinery-parameters'] });
-
-      await router.invalidate();
-
-      notifications.show({
-        title: 'Успех',
-        message: 'Параметр успешно удалён',
-        color: 'teal',
-        icon: <IconCheck size={16} />,
-      });
-
-      await navigate({ search: { ...search, page: 1 } });
-    } catch (error) {
-      if (axios.isAxiosError<ApiErrorResponse>(error)) {
-        if (error.response && error.status !== 500) {
-          notifications.show({
-            title: 'Произошла ошибка',
-            message: error.response.data.message,
-            color: 'red',
-            icon: <IconX size={16} />,
-          });
-        } else {
-          console.error(error);
-          notifications.show({
-            title: 'Произошла ошибка',
-            message: 'Произошла непредвиденная ошибка',
-            color: 'red',
-            icon: <IconX size={16} />,
-          });
-        }
-      } else {
-        console.error(error);
-        notifications.show({
-          title: 'Произошла ошибка',
-          message: 'Произошла непредвиденная ошибка',
-          color: 'red',
-          icon: <IconX size={16} />,
-        });
-      }
-    }
+    deleteMachineryParameter(machineryParameterId);
   };
 
   const tableRows = machineryParameters.data.map(machineryParameter => {
@@ -173,7 +126,7 @@ function MachineryParametersPage() {
     <Stack>
       <Title>Список параметров установок</Title>
       <Box pos='relative'>
-        <LoadingOverlay visible={isFetching} />
+        <LoadingOverlay visible={isMachineryParametersFetching || isMachineryParameterDeleting} />
         <Card withBorder shadow='xl' padding='lg' radius='md'>
           <Card.Section inheritPadding withBorder py='md'>
             <Stack>
