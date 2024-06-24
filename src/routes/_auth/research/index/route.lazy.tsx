@@ -15,19 +15,15 @@ import {
 } from '@mantine/core';
 import { useDebouncedCallback } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { IconCheck, IconEdit, IconEye, IconSearch, IconTrash, IconX } from '@tabler/icons-react';
-import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { Link, createLazyFileRoute, useRouter } from '@tanstack/react-router';
-import axios from 'axios';
+import { IconEdit, IconEye, IconSearch, IconTrash, IconX } from '@tabler/icons-react';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { Link, createLazyFileRoute } from '@tanstack/react-router';
 import { getMachineriesQueryOptions } from '~/api/machineries/get-machineries';
-import { deleteResearch } from '~/api/research/delete-research';
-import { getAllResearchQueryOptions } from '~/api/research/get-all-research';
 
 import PageLoader from '~/components/Loader';
 
 import { useAuth } from '~/hooks/use-auth';
-
-import { ApiErrorResponse } from '~/types/api';
+import useResearchList from '~/hooks/use-research-list';
 
 export const Route = createLazyFileRoute('/_auth/research/')({
   component: ResearchPage,
@@ -37,17 +33,13 @@ export const Route = createLazyFileRoute('/_auth/research/')({
 function ResearchPage() {
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
-  const router = useRouter();
-
-  const queryClient = useQueryClient();
 
   const { data: machineries, isFetching: isMachineriesFetching } = useSuspenseQuery(
     getMachineriesQueryOptions({})
   );
 
-  const { data: research, isFetching: isResearchFetching } = useSuspenseQuery(
-    getAllResearchQueryOptions(search)
-  );
+  const { research, deleteResearch, isResearchDeleting, isResearchFetching } =
+    useResearchList(search);
 
   const { user } = useAuth();
 
@@ -80,7 +72,7 @@ function ResearchPage() {
     });
   };
 
-  const handleDelete = async (researchId: number) => {
+  const handleDelete = (researchId: number) => {
     const researchItem = research.data.find(item => item.id === researchId);
 
     if (researchItem?.author?.id !== user?.data.id) {
@@ -99,49 +91,7 @@ function ResearchPage() {
       return;
     }
 
-    try {
-      await deleteResearch(researchId);
-
-      await queryClient.invalidateQueries({ queryKey: ['research-list'] });
-
-      await router.invalidate();
-
-      notifications.show({
-        title: 'Успех',
-        message: 'Исследование успешно удалено',
-        color: 'teal',
-        icon: <IconCheck size={16} />,
-      });
-
-      await navigate({ search: { ...search, page: 1 } });
-    } catch (error) {
-      if (axios.isAxiosError<ApiErrorResponse>(error)) {
-        if (error.response && error.status !== 500) {
-          notifications.show({
-            title: 'Произошла ошибка',
-            message: error.response.data.message,
-            color: 'red',
-            icon: <IconX size={16} />,
-          });
-        } else {
-          console.error(error);
-          notifications.show({
-            title: 'Произошла ошибка',
-            message: 'Произошла непредвиденная ошибка',
-            color: 'red',
-            icon: <IconX size={16} />,
-          });
-        }
-      } else {
-        console.error(error);
-        notifications.show({
-          title: 'Произошла ошибка',
-          message: 'Произошла непредвиденная ошибка',
-          color: 'red',
-          icon: <IconX size={16} />,
-        });
-      }
-    }
+    deleteResearch(researchId);
   };
 
   const handleEdit = (researchId: number) => {
@@ -200,7 +150,9 @@ function ResearchPage() {
     <Stack>
       <Title>Список исследований</Title>
       <Box pos='relative'>
-        <LoadingOverlay visible={isResearchFetching || isMachineriesFetching} />
+        <LoadingOverlay
+          visible={isResearchFetching || isMachineriesFetching || isResearchDeleting}
+        />
         <Card withBorder shadow='xl' padding='lg' radius='md'>
           <Card.Section inheritPadding withBorder py='md'>
             <Stack>

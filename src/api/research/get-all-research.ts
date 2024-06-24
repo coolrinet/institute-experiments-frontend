@@ -4,7 +4,7 @@ import { apiClient } from '~/lib/api-client';
 
 import { ResearchList } from '~/types/api';
 
-type GetAllResearchParams = {
+export type GetAllResearchParams = {
   page?: number;
   name?: string;
   machineryId?: number;
