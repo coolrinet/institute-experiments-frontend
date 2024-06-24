@@ -4,7 +4,7 @@ import { apiClient } from '~/lib/api-client';
 
 import { Machineries } from '~/types/api';
 
-type GetMachineriesParams = {
+export type GetMachineriesParams = {
   page?: number;
   name?: string;
 };

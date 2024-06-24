@@ -14,19 +14,14 @@ import {
 } from '@mantine/core';
 import { useDebouncedCallback } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { IconCheck, IconEdit, IconSearch, IconTrash, IconX } from '@tabler/icons-react';
-import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { Link, createLazyFileRoute, useRouter } from '@tanstack/react-router';
-import axios from 'axios';
-import { deleteMachinery } from '~/api/machineries/delete-machinery';
-import { getMachineriesQueryOptions } from '~/api/machineries/get-machineries';
+import { IconEdit, IconSearch, IconTrash, IconX } from '@tabler/icons-react';
+import { Link, createLazyFileRoute } from '@tanstack/react-router';
 import { getUserFullName } from '~/utils/get-user-full-name';
 
 import PageLoader from '~/components/Loader';
 
 import { useAuth } from '~/hooks/use-auth';
-
-import { ApiErrorResponse } from '~/types/api';
+import useMachineries from '~/hooks/use-machineries';
 
 export const Route = createLazyFileRoute('/_auth/machineries/')({
   component: MachineriesPage,
@@ -36,12 +31,11 @@ export const Route = createLazyFileRoute('/_auth/machineries/')({
 function MachineriesPage() {
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
-  const router = useRouter();
 
   const { user } = useAuth();
 
-  const queryClient = useQueryClient();
-  const { data: machineries, isFetching } = useSuspenseQuery(getMachineriesQueryOptions(search));
+  const { machineries, deleteMachinery, isMachineriesFetching, isMachineryDeleting } =
+    useMachineries(search);
 
   const totalPages = machineries.meta!.last_page;
 
@@ -81,49 +75,7 @@ function MachineriesPage() {
       return;
     }
 
-    try {
-      await deleteMachinery(machineryId);
-
-      await queryClient.invalidateQueries({ queryKey: ['machineries'] });
-
-      await router.invalidate();
-
-      notifications.show({
-        title: 'Успех',
-        message: 'Установка успешно удалена',
-        color: 'teal',
-        icon: <IconCheck size={16} />,
-      });
-
-      await navigate({ search: { ...search, page: 1 } });
-    } catch (error) {
-      if (axios.isAxiosError<ApiErrorResponse>(error)) {
-        if (error.response && error.status !== 500) {
-          notifications.show({
-            title: 'Произошла ошибка',
-            message: error.response.data.message,
-            color: 'red',
-            icon: <IconX size={16} />,
-          });
-        } else {
-          console.error(error);
-          notifications.show({
-            title: 'Произошла ошибка',
-            message: 'Произошла непредвиденная ошибка',
-            color: 'red',
-            icon: <IconX size={16} />,
-          });
-        }
-      } else {
-        console.error(error);
-        notifications.show({
-          title: 'Произошла ошибка',
-          message: 'Произошла непредвиденная ошибка',
-          color: 'red',
-          icon: <IconX size={16} />,
-        });
-      }
-    }
+    deleteMachinery(machineryId);
   };
 
   const tableRows = machineries.data.map(machinery => {
@@ -161,7 +113,7 @@ function MachineriesPage() {
       <Title>Список установок</Title>
 
       <Box pos='relative'>
-        <LoadingOverlay visible={isFetching} />
+        <LoadingOverlay visible={isMachineriesFetching || isMachineryDeleting} />
         <Card withBorder shadow='xl' padding='lg' radius='md'>
           <Card.Section inheritPadding withBorder py='md'>
             <TextInput

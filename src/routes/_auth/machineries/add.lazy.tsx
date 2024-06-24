@@ -24,12 +24,12 @@ function AddMachineryPage() {
 
   const queryClient = useQueryClient();
 
-  const { isPending, mutateAsync: addMachineryMutation } = useMutation({
+  const { isPending, mutate: addMachineryMutation } = useMutation({
     mutationFn: addMachinery,
     onSuccess: async () => {
-      await router.invalidate();
-
       await queryClient.invalidateQueries({ queryKey: ['machineries'] });
+
+      await router.invalidate();
 
       await navigate({ to: '/machineries', search: { page: 1 } });
 
@@ -70,8 +70,8 @@ function AddMachineryPage() {
     },
   });
 
-  const onSubmit = async (data: MachineryData) => {
-    await addMachineryMutation(data);
+  const onSubmit = (data: MachineryData) => {
+    addMachineryMutation(data);
   };
 
   const { handleSubmit, register, formState } = useForm<MachineryData>({

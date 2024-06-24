@@ -3,27 +3,30 @@ import { IconCheck, IconX } from '@tabler/icons-react';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { getRouteApi, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
-import { deleteUser } from '~/api/users/delete-user';
-import { GetUsersParams, getUsersQueryOptions } from '~/api/users/get-users';
+import { deleteMachinery } from '~/api/machineries/delete-machinery';
+import {
+  GetMachineriesParams,
+  getMachineriesQueryOptions,
+} from '~/api/machineries/get-machineries';
 
 import { ApiErrorResponse } from '~/types/api';
 
-const route = getRouteApi('/_auth/users/');
+const route = getRouteApi('/_auth/machineries/');
 
-export default function useUsers(params: GetUsersParams) {
+export default function useMachineries(params: GetMachineriesParams) {
   const queryClient = useQueryClient();
   const router = useRouter();
-  const search = route.useSearch();
   const navigate = route.useNavigate();
+  const search = route.useSearch();
 
-  const { data: users, isFetching: isUsersFetching } = useSuspenseQuery(
-    getUsersQueryOptions(params)
+  const { data: machineries, isFetching: isMachineriesFetching } = useSuspenseQuery(
+    getMachineriesQueryOptions(params)
   );
 
-  const { mutate: deleteUserMutation, isPending: isUserDeleting } = useMutation({
-    mutationFn: (id: number) => deleteUser(id),
+  const { mutate: deleteMachineryMutation, isPending: isMachineryDeleting } = useMutation({
+    mutationFn: (id: number) => deleteMachinery(id),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['users'] });
+      await queryClient.invalidateQueries({ queryKey: ['machineries'] });
 
       await router.invalidate();
 
@@ -31,7 +34,7 @@ export default function useUsers(params: GetUsersParams) {
 
       notifications.show({
         title: 'Успех',
-        message: 'Пользователь удален из системы',
+        message: 'Установка успешно удалена',
         color: 'teal',
         icon: <IconCheck size={16} />,
       });
@@ -67,9 +70,9 @@ export default function useUsers(params: GetUsersParams) {
   });
 
   return {
-    users,
-    deleteUser: deleteUserMutation,
-    isUsersFetching,
-    isUserDeleting,
+    machineries,
+    isMachineriesFetching,
+    isMachineryDeleting,
+    deleteMachinery: deleteMachineryMutation,
   };
 }

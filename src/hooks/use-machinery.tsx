@@ -3,35 +3,37 @@ import { IconCheck, IconX } from '@tabler/icons-react';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { getRouteApi, useRouter } from '@tanstack/react-router';
 import axios from 'axios';
-import { deleteUser } from '~/api/users/delete-user';
-import { GetUsersParams, getUsersQueryOptions } from '~/api/users/get-users';
+import { editMachinery } from '~/api/machineries/edit-machinery';
+import { getMachineryQueryOptions } from '~/api/machineries/get-machinery';
 
 import { ApiErrorResponse } from '~/types/api';
+import { MachineryData } from '~/types/schema';
 
-const route = getRouteApi('/_auth/users/');
+const route = getRouteApi('/_auth/machineries/$machineryId/edit');
 
-export default function useUsers(params: GetUsersParams) {
+export default function useMachinery(machineryId: number) {
   const queryClient = useQueryClient();
   const router = useRouter();
-  const search = route.useSearch();
   const navigate = route.useNavigate();
 
-  const { data: users, isFetching: isUsersFetching } = useSuspenseQuery(
-    getUsersQueryOptions(params)
-  );
+  const { data: machinery } = useSuspenseQuery(getMachineryQueryOptions(machineryId));
 
-  const { mutate: deleteUserMutation, isPending: isUserDeleting } = useMutation({
-    mutationFn: (id: number) => deleteUser(id),
+  const { mutate: editMachineryMutation, isPending: isMachineryEditing } = useMutation({
+    mutationFn: (data: MachineryData) => editMachinery(machineryId, data),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['users'] });
+      await queryClient.invalidateQueries({ queryKey: ['machineries'] });
+
+      await queryClient.invalidateQueries({
+        queryKey: ['machinery', machineryId],
+      });
 
       await router.invalidate();
 
-      await navigate({ search: { ...search, page: 1 } });
+      await navigate({ to: '/machineries', search: { page: 1 } });
 
       notifications.show({
         title: 'Успех',
-        message: 'Пользователь удален из системы',
+        message: 'Установка успешно изменена',
         color: 'teal',
         icon: <IconCheck size={16} />,
       });
@@ -67,9 +69,8 @@ export default function useUsers(params: GetUsersParams) {
   });
 
   return {
-    users,
-    deleteUser: deleteUserMutation,
-    isUsersFetching,
-    isUserDeleting,
+    machinery,
+    isMachineryEditing,
+    editMachinery: editMachineryMutation,
   };
 }
