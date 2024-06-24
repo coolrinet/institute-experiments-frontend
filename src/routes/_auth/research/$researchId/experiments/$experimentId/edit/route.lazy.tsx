@@ -110,19 +110,19 @@ function EditExperimentPage() {
     defaultValues: {
       name: experiment.data.name,
       date: dayjs(experiment.data.date, 'D MMMM YYYY', 'ru').toDate(),
-      quantitativeInputs: experiment.data.quantitativeInputs.map(param => ({
+      quantitativeInputs: experiment.data.quantitativeInputs?.map(param => ({
         parameterId: param.parameterId,
         value: param.value,
       })),
-      qualityInputs: experiment.data.qualityInputs.map(param => ({
+      qualityInputs: experiment.data.qualityInputs?.map(param => ({
         parameterId: param.parameterId,
         value: param.value,
       })),
-      quantitativeOutputs: experiment.data.quantitativeOutputs.map(param => ({
+      quantitativeOutputs: experiment.data.quantitativeOutputs?.map(param => ({
         parameterId: param.parameterId,
         value: param.value,
       })),
-      qualityOutputs: experiment.data.qualityOutputs.map(param => ({
+      qualityOutputs: experiment.data.qualityOutputs?.map(param => ({
         parameterId: param.parameterId,
         value: param.value,
       })),
@@ -227,7 +227,7 @@ function EditExperimentPage() {
                         <NumberInput
                           {...field}
                           withAsterisk
-                          label={experiment.data.quantitativeInputs[index].name}
+                          label={experiment.data.quantitativeInputs?.[index].name}
                           description='Количественный параметр'
                           placeholder='Введите значение параметра'
                           hideControls
@@ -246,7 +246,7 @@ function EditExperimentPage() {
                         <TextInput
                           {...field}
                           withAsterisk
-                          label={experiment.data.qualityInputs[index].name}
+                          label={experiment.data.qualityInputs?.[index].name}
                           description='Качественный параметр'
                           placeholder='Введите значение параметра'
                           error={formState.errors.qualityInputs?.[index]?.value?.message}
@@ -272,7 +272,7 @@ function EditExperimentPage() {
                         <NumberInput
                           {...field}
                           withAsterisk
-                          label={experiment.data.quantitativeOutputs[index].name}
+                          label={experiment.data.quantitativeOutputs?.[index].name}
                           description='Количественный параметр'
                           placeholder='Введите значение параметра'
                           hideControls
@@ -291,7 +291,7 @@ function EditExperimentPage() {
                         <TextInput
                           {...field}
                           withAsterisk
-                          label={experiment.data.qualityOutputs[index].name}
+                          label={experiment.data.qualityOutputs?.[index].name}
                           description='Качественный параметр'
                           placeholder='Введите значение параметра'
                           error={formState.errors.qualityOutputs?.[index]?.value?.message}
@@ -304,10 +304,10 @@ function EditExperimentPage() {
             </Stepper>
             <Group justify='flex-end' mt='xl'>
               <Button variant='outline' color='red' onClick={() => router.history.back()}>
-                Отменить создание
+                Отменить редактирование
               </Button>
               <Button onClick={handleSubmit(onSubmit)} loading={isPending}>
-                Добавить эксперимент
+                Изменить эксперимент
               </Button>
             </Group>
           </Card>
