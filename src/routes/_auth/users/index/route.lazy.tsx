@@ -12,18 +12,13 @@ import {
   Title,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconCheck, IconTrash, IconX } from '@tabler/icons-react';
-import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { Link, createLazyFileRoute, useRouter } from '@tanstack/react-router';
-import axios from 'axios';
-import { deleteUser } from '~/api/users/delete-user';
-import { getUsersQueryOptions } from '~/api/users/get-users';
+import { IconTrash, IconX } from '@tabler/icons-react';
+import { Link, createLazyFileRoute } from '@tanstack/react-router';
 
 import PageLoader from '~/components/Loader';
 
 import { useAuth } from '~/hooks/use-auth';
-
-import { ApiErrorResponse } from '~/types/api';
+import useUsers from '~/hooks/use-users';
 
 export const Route = createLazyFileRoute('/_auth/users/')({
   component: UsersPage,
@@ -33,17 +28,13 @@ export const Route = createLazyFileRoute('/_auth/users/')({
 function UsersPage() {
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
-  const router = useRouter();
-
-  const queryClient = useQueryClient();
 
   const { user } = useAuth();
-
-  const { data: users, isFetching } = useSuspenseQuery(getUsersQueryOptions(search));
+  const { users, isUsersFetching, isUserDeleting, deleteUser } = useUsers(search);
 
   const totalPages = users.meta!.last_page;
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = (id: number) => {
     if (user?.data.id === id) {
       notifications.show({
         title: 'Произошла ошибка',
@@ -61,49 +52,7 @@ function UsersPage() {
       return;
     }
 
-    try {
-      await deleteUser(id);
-
-      await queryClient.invalidateQueries({ queryKey: ['users'] });
-
-      await router.invalidate();
-
-      notifications.show({
-        title: 'Успех',
-        message: 'Пользователь удален из системы',
-        color: 'teal',
-        icon: <IconCheck size={16} />,
-      });
-
-      await navigate({ search: { ...search, page: 1 } });
-    } catch (error) {
-      if (axios.isAxiosError<ApiErrorResponse>(error)) {
-        if (error.response && error.status !== 500) {
-          notifications.show({
-            title: 'Произошла ошибка',
-            message: error.response.data.message,
-            color: 'red',
-            icon: <IconX size={16} />,
-          });
-        } else {
-          console.error(error);
-          notifications.show({
-            title: 'Произошла ошибка',
-            message: 'Произошла непредвиденная ошибка',
-            color: 'red',
-            icon: <IconX size={16} />,
-          });
-        }
-      } else {
-        console.error(error);
-        notifications.show({
-          title: 'Произошла ошибка',
-          message: 'Произошла непредвиденная ошибка',
-          color: 'red',
-          icon: <IconX size={16} />,
-        });
-      }
-    }
+    deleteUser(id);
   };
 
   const tableRows = users.data.map(user => (
@@ -129,7 +78,7 @@ function UsersPage() {
     <Stack>
       <Title>Список пользователей</Title>
       <Box pos='relative'>
-        <LoadingOverlay visible={isFetching} />
+        <LoadingOverlay visible={isUsersFetching || isUserDeleting} />
         <Card withBorder shadow='xl' padding='lg' radius='md'>
           {users.data.length ? (
             <Table.ScrollContainer minWidth={500}>

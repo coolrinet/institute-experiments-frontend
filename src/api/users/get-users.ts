@@ -4,7 +4,7 @@ import { apiClient } from '~/lib/api-client';
 
 import { Users } from '~/types/api';
 
-type GetUsersParams = {
+export type GetUsersParams = {
   page?: number;
 };
 
